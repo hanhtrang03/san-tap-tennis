@@ -1,0 +1,2257 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Học tennis với mô hình 3D từng cú đánh, giáo trình 20 buổi tự tập tại nhà và sơ đồ bộ chân.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Sân Tập Tennis</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: court-side training sheet — 3D lab first (viewer + coaching notes), AI coach second, scoreboard as the one bold object. */
+:root{
+  --bg:#edf1f4; --surface:#ffffff; --surface-2:#f3f6f9; --ink:#102030; --muted:#56677a; --line:#d5dde5;
+  --court:#1d5390; --court-ink:#1b4f8a; --on-court:#ffffff; --court-soft:#e3ecf6;
+  --ball:#d3ea3c; --ball-ink:#56650a;
+  --good:#1f7d47; --warn:#9a6505; --bad:#bb3729;
+  --good-bg:#e3f3e9; --warn-bg:#fbf0d9; --bad-bg:#fbe5e1;
+  --sky:#d9e3ec; --foot-l:#d4712a; --foot-r:#1b4f8a; --c-warm:#c58a1a;
+  --board:#0f2b22; --board-2:#163a2e; --board-ink:#eef3e2; --board-dim:#97b2a3; --board-accent:#d9f043;
+  --shadow:0 1px 2px rgba(16,32,48,.06),0 6px 18px rgba(16,32,48,.06);
+  --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b141d; --surface:#121f2b; --surface-2:#172735; --ink:#e3ebf2; --muted:#93a4b5; --line:#233648;
+    --court:#2a64a8; --court-ink:#86b5ee; --on-court:#ffffff; --court-soft:#16304b;
+    --ball:#d3ea3c; --ball-ink:#d7ec55;
+    --good:#55c483; --warn:#e6ad46; --bad:#f07565;
+    --good-bg:#12321f; --warn-bg:#352812; --bad-bg:#3a1c18;
+    --sky:#0f1b27; --foot-l:#f0954a; --foot-r:#86b5ee; --c-warm:#e2ad4a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b141d; --surface:#121f2b; --surface-2:#172735; --ink:#e3ebf2; --muted:#93a4b5; --line:#233648;
+  --court:#2a64a8; --court-ink:#86b5ee; --on-court:#ffffff; --court-soft:#16304b;
+  --ball:#d3ea3c; --ball-ink:#d7ec55;
+  --good:#55c483; --warn:#e6ad46; --bad:#f07565;
+  --good-bg:#12321f; --warn-bg:#352812; --bad-bg:#3a1c18;
+  --sky:#0f1b27; --foot-l:#f0954a; --foot-r:#86b5ee; --c-warm:#e2ad4a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.05;margin:0;text-wrap:balance;letter-spacing:.005em}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--court-ink);outline-offset:2px;border-radius:6px}
+.eyebrow{font-family:var(--f-display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--court-ink)}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none}
+.brand svg{width:34px;height:34px;flex:none}
+.brand b{font-family:var(--f-display);font-size:26px;font-weight:700;letter-spacing:.01em;line-height:1}
+.brand span{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;line-height:1.1}
+.top nav{display:flex;gap:6px;flex-wrap:wrap}
+.top nav a{font-family:var(--f-display);font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;color:var(--ink);padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.top nav a:hover{border-color:var(--court-ink);color:var(--court-ink)}
+
+.intro{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px 48px;align-items:end;padding-block:18px 26px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.intro h1{font-size:clamp(36px,5.4vw,64px);text-transform:uppercase;letter-spacing:.005em}
+.intro h1 em{font-style:normal;color:var(--court-ink)}
+.intro p{color:var(--muted);max-width:52ch;font-size:16px}
+@media (max-width:760px){.intro{grid-template-columns:1fr}}
+
+/* stroke tabs */
+.stroke-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:thin}
+.stroke-tab{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:9px 16px 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;min-width:120px}
+.stroke-tab b{font-family:var(--f-display);font-size:20px;font-weight:700;line-height:1.1}
+.stroke-tab small{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.stroke-tab:hover{border-color:var(--court-ink)}
+.stroke-tab[aria-selected="true"]{background:var(--court);border-color:var(--court);color:var(--on-court)}
+.stroke-tab[aria-selected="true"] small{color:rgba(255,255,255,.78)}
+
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:960px){.lab-grid{grid-template-columns:1fr}}
+
+/* viewer */
+.viewer{position:relative;border-radius:var(--r);overflow:hidden;background:var(--sky);aspect-ratio:16/11;max-width:100%;box-shadow:var(--shadow);touch-action:pan-y;cursor:grab;outline:none}
+.viewer:active{cursor:grabbing}
+.viewer:focus-visible{outline:2px solid var(--court-ink);outline-offset:3px}
+.viewer canvas{display:block;width:100%;height:100%}
+.overlay{position:absolute;left:12px;top:12px;max-width:min(360px,calc(100% - 24px));background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);border-radius:10px;padding:10px 13px;pointer-events:none;border:1px solid var(--line)}
+.overlay .tag{font-family:var(--f-display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--court-ink)}
+.overlay strong{display:block;font-family:var(--f-display);font-size:22px;line-height:1.1;margin:1px 0 3px}
+.overlay p{font-size:13px;color:var(--muted);line-height:1.45}
+.cam-ctl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:4px}
+.cam-ctl button{font-family:var(--f-display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 92%,transparent);border-radius:8px;padding:5px 10px;cursor:pointer;text-align:right}
+.cam-ctl button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hint{position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--muted);background:color-mix(in srgb,var(--surface) 80%,transparent);padding:3px 8px;border-radius:6px;pointer-events:none}
+.gl-fail{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted);font-size:14px}
+@media (max-width:560px){
+  .viewer{aspect-ratio:1/1}
+  .overlay{left:8px;top:8px;padding:8px 10px}.overlay strong{font-size:18px}.overlay p{display:none}
+  .cam-ctl{right:8px;top:8px}.cam-ctl button{padding:4px 8px;font-size:12px}
+  .hint{display:none}
+}
+
+/* transport */
+.transport{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.tbtns{display:flex;gap:4px}
+.icon-btn{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;cursor:pointer}
+.icon-btn svg{width:18px;height:18px;fill:currentColor}
+.icon-btn.play{background:var(--court);border-color:var(--court);color:var(--on-court);width:44px}
+.scrub{display:flex;flex-direction:column;gap:5px;min-width:0}
+.scrub input{width:100%;accent-color:var(--court);margin:0}
+.phase-strip{position:relative;height:22px}
+.phase-strip button{position:absolute;top:0;height:22px;border:0;border-left:1px solid var(--bg);background:var(--surface-2);font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 5px;cursor:pointer;text-align:left}
+.phase-strip button.on{background:var(--court-soft);color:var(--court-ink);font-weight:600}
+.phase-strip button:first-child{border-radius:5px 0 0 5px;border-left:0}
+.phase-strip button:last-child{border-radius:0 5px 5px 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface-2)}
+.seg button{border:0;background:transparent;padding:7px 10px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:640px){
+  .transport{grid-template-columns:1fr auto;}
+  .scrub{grid-column:1/-1;grid-row:2}
+  .phase-strip button{font-size:0}
+}
+.toggles{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;font-size:14px;color:var(--muted)}
+.toggles label{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.toggles input{accent-color:var(--court);width:16px;height:16px;margin:0}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;background:#f4c534;vertical-align:middle}
+.swatch.ring{width:10px;height:10px;border-radius:50%;background:transparent;border:2px solid #f4c534}
+
+/* info panel */
+.info{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.info h2{font-size:38px;text-transform:uppercase}
+.info h3{font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-top:6px;border-top:1px solid var(--line);margin-top:4px;padding-top:14px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 0}
+.specs div{background:var(--surface-2);border-radius:9px;padding:8px 11px}
+.specs dt{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.specs dd{margin:0;font-weight:600;font-size:14px;line-height:1.35}
+.phases{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.phases button{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;text-align:left;border:1px solid transparent;background:transparent;border-radius:9px;padding:7px 8px;cursor:pointer}
+.phases button:hover{background:var(--surface-2)}
+.phases button.on{background:var(--court-soft);border-color:color-mix(in srgb,var(--court-ink) 30%,transparent)}
+.ph-n{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--muted);text-align:center;line-height:1.3;font-variant-numeric:tabular-nums}
+.phases button.on .ph-n{color:var(--court-ink)}
+.phases b{display:block;font-size:14.5px;font-weight:600;line-height:1.35}
+.phases small{display:block;color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px}
+.keys,.drills-l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.keys li::marker,.drills-l li::marker{color:var(--court-ink)}
+.mistakes{display:flex;flex-direction:column;gap:8px}
+.mistake{border-radius:9px;background:var(--surface-2);padding:9px 12px;font-size:14px}
+.mistake b{display:flex;gap:7px;align-items:baseline;font-weight:600;color:var(--bad)}
+.mistake b::before{content:"✕";font-size:12px}
+.mistake p{color:var(--ink);margin-top:3px}
+.mistake p::before{content:"Sửa: ";font-weight:600;color:var(--good)}
+
+/* coach */
+.coach{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+.coach-head{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px 48px;align-items:end;margin-bottom:22px}
+.coach-head h2{font-size:clamp(32px,4.4vw,52px);text-transform:uppercase;margin-top:4px}
+.coach-head p{color:var(--muted);max-width:56ch}
+@media (max-width:760px){.coach-head{grid-template-columns:1fr}}
+.coach-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:960px){.coach-grid{grid-template-columns:1fr}}
+.upload{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;border:1.5px dashed color-mix(in srgb,var(--court-ink) 45%,var(--line));border-radius:10px;padding:26px 16px;cursor:pointer;background:var(--surface-2)}
+.drop.drag{background:var(--court-soft);border-color:var(--court-ink)}
+.drop svg{width:34px;height:34px;color:var(--court-ink)}
+.drop b{font-weight:600}
+.drop small{color:var(--muted);font-size:13px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.vid-wrap{display:flex;flex-direction:column;gap:10px}
+.vid-wrap video{width:100%;max-height:340px;border-radius:10px;background:#000}
+.vid-meta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.linkbtn{border:0;background:none;color:var(--court-ink);cursor:pointer;padding:0;font-size:13px;text-decoration:underline;text-underline-offset:2px}
+.trim{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trim label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--muted)}
+.trim output{font-family:var(--f-display);font-weight:600;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+.trim input{accent-color:var(--court);width:100%;margin:0}
+.warn-line{font-size:13px;color:var(--warn)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);min-width:0}
+.field.full{grid-column:1/-1}
+.field select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.field .seg{width:100%}
+.field .seg button{flex:1;font-family:var(--f-body);font-size:14px;font-weight:500}
+.primary{border:0;border-radius:10px;background:var(--court);color:var(--on-court);font-weight:600;font-size:16px;padding:13px 18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px}
+.primary:disabled{opacity:.45;cursor:not-allowed}
+.primary svg{width:18px;height:18px;fill:currentColor}
+.ai-note{font-size:13px;color:var(--muted)}
+.ai-note.err{color:var(--bad)}
+.tips{font-size:13.5px;border-top:1px solid var(--line);padding-top:12px}
+.tips summary{cursor:pointer;font-weight:600}
+.tips ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+
+/* result */
+.result{display:flex;flex-direction:column;gap:14px;min-width:0}
+.res-badge{align-self:flex-start;font-family:var(--f-display);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:var(--warn-bg);color:var(--warn)}
+.res-badge.mine{background:var(--good-bg);color:var(--good)}
+.status{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.status .spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--court-soft);border-top-color:var(--court-ink);animation:spin 1s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status div{flex:1;min-width:0}
+.status b{display:block;font-weight:600}
+.status small{color:var(--muted);font-variant-numeric:tabular-nums}
+.status button{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:7px 12px;cursor:pointer}
+.board{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 24px;align-items:center;position:relative;overflow:hidden}
+.board::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;border-radius:50%;border:2px solid rgba(217,240,67,.12);pointer-events:none}
+.board .lbl{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--board-dim)}
+.big{font-family:var(--f-display);font-weight:700;font-size:96px;line-height:.9;color:var(--board-accent);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.big small{font-size:28px;color:var(--board-dim);font-weight:600;margin-left:4px}
+.board-r{display:flex;flex-direction:column;gap:8px;min-width:0}
+.grade{font-family:var(--f-display);font-weight:700;font-size:30px;text-transform:uppercase;line-height:1}
+.board-meta{display:flex;flex-wrap:wrap;gap:6px}
+.board-meta span{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--board-2);color:var(--board-ink)}
+.board-r p{font-size:14px;color:var(--board-ink);opacity:.92;line-height:1.5}
+@media (max-width:520px){.board{grid-template-columns:1fr}.big{font-size:80px}}
+.frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.frame{position:relative;border-radius:8px;overflow:hidden;background:var(--surface-2);border:2px solid transparent;cursor:pointer;padding:0;aspect-ratio:4/3}
+.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.frame span{position:absolute;left:4px;bottom:4px;font-size:11px;font-weight:600;background:rgba(10,20,30,.72);color:#fff;padding:1px 6px;border-radius:4px;font-variant-numeric:tabular-nums}
+.frame.flag::after{content:"";position:absolute;right:5px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px #fff}
+.frame.hl{border-color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.card h3{font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+.subs{display:flex;flex-direction:column;gap:10px}
+.sub{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;align-items:baseline}
+.sub b{font-size:14px;font-weight:600}
+.sub output{font-family:var(--f-display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.sub output small{font-size:14px;color:var(--muted);font-weight:500}
+.bar{grid-column:1/-1;height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px}
+.sub p{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.priority{margin-top:10px;padding:10px 12px;border-radius:9px;background:var(--court-soft);font-size:14px}
+.priority b{color:var(--court-ink)}
+.strengths{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.strengths li{display:flex;gap:8px}
+.strengths li::before{content:"✓";color:var(--good);font-weight:700}
+.errs{display:flex;flex-direction:column;gap:10px}
+.err{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;border-left:4px solid var(--sev)}
+.err[data-sev="cao"]{--sev:var(--bad)} .err[data-sev="vừa"]{--sev:var(--warn)} .err[data-sev="thấp"]{--sev:var(--muted)}
+.err h4{margin:0;font-size:15px;font-weight:600;line-height:1.35}
+.err-tags{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1}
+.chip{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:0;cursor:default}
+button.chip{cursor:pointer;color:var(--court-ink);background:var(--court-soft)}
+.chip.sev{background:color-mix(in srgb,var(--sev) 16%,transparent);color:var(--sev)}
+.err p{grid-column:1/-1;font-size:14px}
+.err .fix{color:var(--ink)}
+.err .fix::before{content:"Cách sửa: ";font-weight:600;color:var(--good)}
+.err .detail{color:var(--muted)}
+.err .see{grid-row:1;grid-column:2;align-self:start;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--court-ink);white-space:nowrap}
+.drill-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.drill{background:var(--surface-2);border-radius:10px;padding:11px 13px;font-size:14px}
+.drill b{display:block;font-weight:600;margin-bottom:2px}
+.drill p{color:var(--muted);font-size:13.5px}
+.invalid{background:var(--warn-bg);color:var(--ink);border-radius:var(--r);padding:16px 18px}
+.invalid b{color:var(--warn)}
+.history table{width:100%;border-collapse:collapse;font-size:14px}
+.history td,.history th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
+.history th{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.history td.n{font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.history .mini{display:block;height:6px;border-radius:3px;background:var(--surface-2);min-width:60px}
+.history .mini i{display:block;height:100%;border-radius:3px;background:var(--court)}
+.tablewrap{overflow-x:auto}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+/* footwork */
+.sec{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px 48px;align-items:end;margin-bottom:22px}
+.sec-head h2{font-size:clamp(32px,4.4vw,52px);text-transform:uppercase;margin-top:4px}
+.sec-head p{color:var(--muted);max-width:58ch}
+@media (max-width:760px){.sec-head{grid-template-columns:1fr}}
+.fw-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:12px}
+.fw-legend span{display:inline-flex;align-items:center;gap:6px}
+.fw-legend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.fw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.fw-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;min-width:0;scroll-margin-top:20px;transition:box-shadow .3s,border-color .3s}
+.fw-card.flash{border-color:var(--court-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--court-ink) 30%,transparent)}
+.fw-card.wide{grid-column:1/-1}
+.fw-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.fw-card h3{font-size:24px;text-transform:uppercase}
+.fw-card .en{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.fw-svg{width:100%;max-width:240px;align-self:center;aspect-ratio:1/1;height:auto;background:var(--surface-2);border-radius:10px}
+.fw-when{font-size:13px;color:var(--court-ink);font-weight:600}
+.fw-card ol{margin:0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}
+.fw-card ol li::marker{font-weight:700;color:var(--muted)}
+.fw-mis{font-size:13px;color:var(--muted)}
+.fw-mis b{color:var(--bad);font-weight:600}
+.stance-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.stance-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stance{display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}
+.stance svg{width:100%;max-width:150px;aspect-ratio:1/1;height:auto;background:var(--surface-2);border-radius:10px}
+.stance b{font-family:var(--f-display);font-size:19px;text-transform:uppercase;line-height:1.1}
+.stance small{font-size:12.5px;color:var(--muted);line-height:1.4}
+.fp{transition:opacity .25s}
+.fp.off{opacity:.08}
+.fp.now .sole{stroke:var(--ink);stroke-width:1.6}
+.fp-n{font:700 9px var(--f-body);fill:var(--ink)}
+.fp-badge{fill:var(--surface)}
+
+/* curriculum */
+.kit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+@media (max-width:900px){.kit{grid-template-columns:1fr}}
+.kit .card ul{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.kit .card p{font-size:14px}
+.kit .card p+p{margin-top:6px}
+.prog{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.prog .bar{flex:1;min-width:160px;height:10px}
+.prog .bar i{background:var(--good)}
+.prog b{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.prog span{font-size:13px;color:var(--muted)}
+.plan{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.plan{grid-template-columns:1fr}}
+.sess-list{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.ph-group h4{margin:0 0 6px;font-family:var(--f-display);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.ph-group h4 em{font-style:normal;color:var(--court-ink)}
+.ph-btns{display:flex;flex-direction:column;gap:3px}
+.sess-btn{display:grid;grid-template-columns:30px minmax(0,1fr) 18px;gap:8px;align-items:center;text-align:left;border:1px solid transparent;background:transparent;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:14px}
+.sess-btn:hover{background:var(--surface-2)}
+.sess-btn.on{background:var(--court-soft);border-color:color-mix(in srgb,var(--court-ink) 30%,transparent)}
+.sess-btn .n{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center}
+.sess-btn.on .n{color:var(--court-ink)}
+.sess-btn .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-btn .ck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;color:transparent}
+.sess-btn.done .ck{background:var(--good);border-color:var(--good);color:#fff}
+.sess-btn.test .t::after{content:" · kiểm tra";color:var(--warn);font-size:12px}
+@media (max-width:960px){
+  .ph-btns{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .sess-btn{grid-template-columns:auto;padding:6px 0;width:44px;justify-items:center;border-color:var(--line);position:relative}
+  .sess-btn .t{display:none}
+  .sess-btn .ck{position:absolute;top:-5px;right:-5px;width:14px;height:14px;font-size:9px;background:var(--surface)}
+  .sess-btn:not(.done) .ck{display:none}
+}
+.sess{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;scroll-margin-top:16px}
+.sess h3{font-size:clamp(28px,3.4vw,40px);text-transform:uppercase}
+.sess-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sess-meta .dur{font-family:var(--f-display);font-weight:700;font-size:20px;margin-right:6px;font-variant-numeric:tabular-nums}
+.tl{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px}
+.tl i{display:block;height:100%}
+.tl-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.tl-leg span{display:inline-flex;align-items:center;gap:5px}
+.tl-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.blk{display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;padding-top:12px;border-top:1px solid var(--line)}
+.blk-h{display:flex;flex-direction:column;gap:2px}
+.blk-h b{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.blk-h small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.25}
+.blk-h::before{content:"";display:block;width:24px;height:4px;border-radius:2px;background:var(--bc);margin-bottom:6px}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.items li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:baseline;font-size:14.5px}
+.items .dose{font-size:13px;font-weight:600;color:var(--ink);background:var(--surface-2);padding:1px 8px;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.items .lk{grid-column:1/-1;justify-self:start;border:0;background:none;padding:0;color:var(--court-ink);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+@media (max-width:520px){.items li{grid-template-columns:1fr}.items .dose{justify-self:start}.blk{grid-template-columns:48px minmax(0,1fr)}}
+.goal{background:var(--good-bg);border-radius:10px;padding:11px 14px;font-size:14.5px}
+.goal b{color:var(--good)}
+.sess-note{font-size:13px;color:var(--warn)}
+.sess-nav{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.ghost{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:500}
+.ghost:disabled{opacity:.4;cursor:default}
+.done-btn{border:0;border-radius:9px;padding:10px 16px;cursor:pointer;font-weight:600;background:var(--court);color:var(--on-court)}
+.done-btn.is-done{background:var(--good-bg);color:var(--good)}
+
+/* curriculum v3: compact session picker + 3D drill viewer */
+.plan{grid-template-columns:1fr}
+.sess-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 18px}
+@media (max-width:760px){.sess-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ph-btns{flex-direction:row;flex-wrap:wrap;gap:6px}
+.sess-btn{grid-template-columns:auto;padding:6px 0;width:44px;justify-items:center;border-color:var(--line);position:relative}
+.sess-btn .t{display:none}
+.sess-btn .ck{position:absolute;top:-5px;right:-5px;width:15px;height:15px;font-size:9px;background:var(--surface)}
+.sess-btn:not(.done) .ck{display:none}
+.sess-btn.test{border-style:dashed}
+.sess-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:1020px){.sess-body{grid-template-columns:1fr}}
+.sess-content{display:flex;flex-direction:column;gap:14px;min-width:0}
+.dv{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:10px;min-width:0}
+@media (max-width:1020px){.dv{position:static;order:-1}}
+.dv-head h4{margin:2px 0 0;font-family:var(--f-display);font-size:24px;text-transform:uppercase;line-height:1.1}
+.dv-view{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:10px;overflow:hidden;background:var(--sky);touch-action:pan-y;cursor:grab;border:1px solid var(--line)}
+.dv-view:active{cursor:grabbing}
+.dv-view canvas{display:block;width:100%;height:100%}
+.dv-cam{flex-direction:row;flex-wrap:wrap;justify-content:flex-end;left:8px;right:8px;top:8px}
+.dv-cam button{padding:4px 8px;font-size:12px}
+.dv-legend{position:absolute;left:10px;bottom:8px;display:flex;gap:10px;font-size:12px;background:color-mix(in srgb,var(--surface) 88%,transparent);padding:3px 8px;border-radius:6px}
+.dv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.dv-ctl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.dv-ctl input{width:100%;accent-color:var(--court);margin:0}
+.dv-ctl .icon-btn{width:34px;height:34px}
+.dv-ctl .icon-btn.play{width:40px}
+.dv-steps button{padding:6px 8px}
+.dv-steps small{font-size:13.5px}
+.dv-tips{font-size:13px;color:var(--muted)}
+.it{border-radius:8px;padding:5px 8px;margin:0 -8px;border:1px solid transparent}
+.it.has3d{cursor:pointer}
+.it.has3d:hover{background:var(--surface-2)}
+.it.sel{background:var(--court-soft);border-color:color-mix(in srgb,var(--court-ink) 30%,transparent)}
+.it .t3d{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--court-ink);border:1px solid color-mix(in srgb,var(--court-ink) 40%,transparent);border-radius:4px;padding:0 4px;margin-right:6px;vertical-align:1px}
+.it.sel .t3d{background:var(--court);color:var(--on-court);border-color:var(--court)}
+@media (prefers-reduced-motion: reduce){.status .spin{animation:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#mo-phong" aria-label="Sân Tập Tennis">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#d3ea3c"/><path d="M6.5 8.5c6 5 6 18 0 23M33.5 8.5c-6 5-6 18 0 23" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <div><b>Sân Tập</b><span>Tennis · 3D · AI</span></div>
+    </a>
+    <nav aria-label="Mục chính"><a href="#mo-phong">Mô phỏng 3D</a><a href="#bo-chan">Bộ chân</a><a href="#giao-trinh">Giáo trình 20 buổi</a><a href="#cham-diem">AI chấm điểm</a></nav>
+  </header>
+
+  <section class="intro">
+    <h1>Xem từng cú đánh <em>chậm lại</em>, rồi để AI soi động tác của bạn</h1>
+    <p>Mô hình 3D tách mỗi cú đánh thành từng giai đoạn: xoay góc nhìn, chỉnh tốc độ, xem đường vung vợt và điểm tiếp xúc. Sau đó tải video của bạn lên để được chấm điểm và chỉ ra lỗi sai ở từng khung hình.</p>
+  </section>
+
+  <section id="mo-phong" aria-label="Mô phỏng 3D các cú đánh">
+    <div class="stroke-tabs" id="strokeTabs" role="tablist" aria-label="Chọn cú đánh"></div>
+    <div class="lab-grid">
+      <div>
+        <div class="viewer" id="viewer" tabindex="0" aria-label="Mô hình 3D. Phím cách để phát hoặc dừng, mũi tên trái phải để chuyển giai đoạn.">
+          <canvas id="c3d"></canvas>
+          <div class="overlay" aria-live="polite"><span class="tag" id="phaseTag">Giai đoạn 1/6</span><strong id="phaseName">Tư thế chờ</strong><p id="phaseCue"></p></div>
+          <div class="cam-ctl" id="camCtl" role="group" aria-label="Góc nhìn">
+            <button data-cam="side" aria-pressed="true">Ngang</button>
+            <button data-cam="back" aria-pressed="false">Sau lưng</button>
+            <button data-cam="front" aria-pressed="false">Trước mặt</button>
+            <button data-cam="top" aria-pressed="false">Trên cao</button>
+          </div>
+          <div class="hint">Kéo để xoay · nhấp rồi cuộn để thu phóng</div>
+          <div class="gl-fail" id="glFail" hidden>Trình duyệt này không hiển thị được đồ hoạ 3D (WebGL). Phần hướng dẫn và AI chấm điểm vẫn dùng bình thường.</div>
+        </div>
+        <div class="transport">
+          <div class="tbtns">
+            <button class="icon-btn" id="btnPrev" aria-label="Giai đoạn trước"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+            <button class="icon-btn play" id="btnPlay" aria-label="Tạm dừng"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+            <button class="icon-btn" id="btnNext" aria-label="Giai đoạn sau"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+          </div>
+          <div class="scrub">
+            <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Thời điểm trong cú đánh">
+            <div class="phase-strip" id="phaseStrip"></div>
+          </div>
+          <div class="seg" id="speedSeg" role="group" aria-label="Tốc độ">
+            <button data-speed="0.25" aria-pressed="false">¼×</button>
+            <button data-speed="0.5" aria-pressed="true">½×</button>
+            <button data-speed="1" aria-pressed="false">1×</button>
+          </div>
+        </div>
+        <div class="toggles">
+          <label><input type="checkbox" id="tgPath" checked> <span class="swatch"></span> Đường vung vợt</label>
+          <label><input type="checkbox" id="tgContact" checked> <span class="swatch ring"></span> Điểm tiếp xúc lý tưởng</label>
+          <label><input type="checkbox" id="tgLefty"> Người thuận tay trái</label>
+        </div>
+      </div>
+
+      <aside class="info" aria-live="polite">
+        <div>
+          <p class="eyebrow" id="sEn">Forehand</p>
+          <h2 id="sName">Thuận tay</h2>
+          <dl class="specs">
+            <div><dt>Cách cầm vợt</dt><dd id="sGrip"></dd></div>
+            <div><dt>Thế chân</dt><dd id="sStance"></dd></div>
+          </dl>
+        </div>
+        <h3>Các giai đoạn</h3>
+        <ol class="phases" id="phaseList"></ol>
+        <h3>Lưu ý quan trọng</h3>
+        <ul class="keys" id="keyList"></ul>
+        <h3>Lỗi thường gặp</h3>
+        <div class="mistakes" id="mistakeList"></div>
+        <h3>Bài tập gợi ý</h3>
+        <ul class="drills-l" id="drillList"></ul>
+      </aside>
+    </div>
+  </section>
+
+  <section id="bo-chan" class="sec" aria-label="Bộ chân và cách di chuyển">
+    <div class="sec-head">
+      <div><p class="eyebrow">Bộ chân &amp; di chuyển</p><h2>Đánh tốt bắt đầu từ đôi chân</h2></div>
+      <p>Sơ đồ nhìn từ trên xuống, lưới ở phía trên, người chơi thuận tay phải. Các bước sáng lần lượt theo đúng thứ tự; dấu chân mờ là vị trí xuất phát.</p>
+    </div>
+    <div class="fw-legend"><span><i style="background:var(--foot-l)"></i>Chân trái</span><span><i style="background:var(--foot-r)"></i>Chân phải</span><span><i style="background:var(--ball)"></i>Bóng</span><span><i style="background:transparent;border:1.5px dashed var(--muted)"></i>Vị trí xuất phát</span></div>
+    <div class="fw-grid" id="fwGrid"></div>
+  </section>
+
+  <section id="giao-trinh" class="sec" aria-label="Giáo trình 20 buổi tự tập tại nhà">
+    <div class="sec-head">
+      <div><p class="eyebrow">Tự tập tại nhà</p><h2>Giáo trình 20 buổi</h2></div>
+      <p>Bốn giai đoạn, mỗi giai đoạn 5 buổi khoảng 50–60 phút: khởi động, bộ chân, kỹ thuật, thể lực và thả lỏng. Buổi 5, 10, 15, 20 là buổi kiểm tra: quay video và dùng AI chấm điểm để đo tiến bộ.</p>
+    </div>
+    <div class="kit">
+      <div class="card"><h3>Dụng cụ</h3><ul>
+        <li>Vợt và 3–6 quả bóng (bóng xốp nếu tập trong nhà)</li>
+        <li>4 chai nước hoặc cọc làm mốc</li>
+        <li>Băng dính dán sàn làm thang dây (10 ô × 45 cm)</li>
+        <li>Dây nhảy, dây kháng lực</li>
+        <li>Một bức tường phẳng (không bắt buộc)</li>
+        <li>Điện thoại để quay video</li>
+      </ul></div>
+      <div class="card"><h3>Lịch tập</h3>
+        <p>3 buổi mỗi tuần (ví dụ thứ 2, 4, 6), xong trong khoảng 7 tuần. Tập 4 buổi mỗi tuần thì khoảng 5 tuần.</p>
+        <p>Nghỉ ít nhất một ngày giữa hai buổi. Chưa đạt mục tiêu của buổi thì lặp lại buổi đó trước khi sang buổi mới.</p>
+        <p>Cần không gian tối thiểu khoảng 3 × 4 m.</p>
+      </div>
+      <div class="card"><h3>An toàn</h3><ul>
+        <li>Dọn đồ dễ vỡ, tập trên sàn không trơn, mang giày thể thao.</li>
+        <li>Vung vợt cách tường, đồ đạc và người khác ít nhất 1 m.</li>
+        <li>Trần thấp: tập giao bóng bằng khăn hoặc cầm vợt ngắn, hoặc ra ban công, sân.</li>
+        <li>Dừng ngay nếu đau khớp vai, khuỷu tay, gối hoặc cổ chân.</li>
+      </ul></div>
+    </div>
+    <div class="prog"><b id="progTxt">0/20</b><div class="bar"><i id="progBar" style="width:0%"></i></div><span>buổi đã tập · lưu trên trình duyệt này</span></div>
+    <div class="plan">
+      <nav class="sess-list" id="sessList" aria-label="Danh sách buổi tập"></nav>
+      <article class="sess" id="sess">
+        <div id="sessHead" style="display:flex;flex-direction:column;gap:12px"></div>
+        <div class="sess-body">
+          <div class="sess-content" id="sessContent"></div>
+          <aside class="dv" id="dv" aria-label="Mô phỏng 3D động tác">
+            <div class="dv-head"><p class="eyebrow">Mô phỏng 3D · bấm vào bài tập bên cạnh</p><h4 id="dvName">Chọn một bài tập</h4></div>
+            <div class="dv-view" id="dvView">
+              <canvas id="dvCanvas"></canvas>
+              <div class="cam-ctl dv-cam" id="dvCam" role="group" aria-label="Góc nhìn">
+                <button data-cam="cheo" aria-pressed="true">Chéo</button><button data-cam="ngang" aria-pressed="false">Ngang</button><button data-cam="truoc" aria-pressed="false">Trước</button><button data-cam="sau" aria-pressed="false">Sau</button><button data-cam="tren" aria-pressed="false">Trên</button>
+              </div>
+              <div class="dv-legend" id="dvLegend" hidden><span><i style="background:#e8742c"></i>Khớp ngón trỏ</span><span><i style="background:#2b7bd6"></i>Đệm gót bàn tay</span></div>
+              <div class="gl-fail" id="dvFail" hidden>Trình duyệt không hiển thị được 3D. Các bước hướng dẫn bên dưới vẫn đầy đủ.</div>
+            </div>
+            <div class="dv-ctl">
+              <div class="tbtns">
+                <button class="icon-btn" id="dvPrev" aria-label="Bước trước"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+                <button class="icon-btn play" id="dvPlay" aria-label="Tạm dừng"><svg viewBox="0 0 24 24" id="dvPlayIcon"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+                <button class="icon-btn" id="dvNext" aria-label="Bước sau"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+              </div>
+              <input type="range" id="dvScrub" min="0" max="1000" value="0" aria-label="Thời điểm">
+              <div class="seg" id="dvSpeed" role="group" aria-label="Tốc độ"><button data-speed="0.25" aria-pressed="false">¼×</button><button data-speed="0.5" aria-pressed="true">½×</button><button data-speed="1" aria-pressed="false">1×</button></div>
+            </div>
+            <ol class="phases dv-steps" id="dvSteps"></ol>
+            <p class="dv-tips" id="dvTips"></p>
+          </aside>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="cham-diem" class="coach sec" aria-label="AI chấm điểm động tác">
+    <div class="coach-head">
+      <div><p class="eyebrow">Huấn luyện viên AI</p><h2>Tải video lên, nhận điểm và lỗi sai</h2></div>
+      <p>AI xem các khung hình trích từ video của bạn, so với chuẩn kỹ thuật của cú đánh đã chọn, chấm 5 tiêu chí trên thang 100 điểm và chỉ ra lỗi nằm ở khung hình nào, kèm cách sửa.</p>
+    </div>
+    <div class="coach-grid">
+      <div class="upload">
+        <label class="drop" id="drop" for="file">
+          <input type="file" id="file" accept="video/*">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/><path d="M9.5 9.5v5M7 12h5"/></svg>
+          <b>Chọn hoặc thả video vào đây</b>
+          <small>MP4, MOV, WebM · nên dài 3–10 giây, một cú đánh</small>
+        </label>
+        <div class="vid-wrap" id="vidWrap" hidden>
+          <video id="vid" playsinline controls muted preload="auto"></video>
+          <div class="vid-meta"><span id="vidInfo"></span><button class="linkbtn" id="btnChange" type="button">Chọn video khác</button></div>
+          <div class="trim">
+            <label>Bắt đầu <output id="outStart">0.0 s</output><input type="range" id="rngStart" min="0" max="10" step="0.1" value="0"></label>
+            <label>Kết thúc <output id="outEnd">0.0 s</output><input type="range" id="rngEnd" min="0" max="10" step="0.1" value="10"></label>
+          </div>
+          <p class="warn-line" id="trimWarn" hidden></p>
+        </div>
+        <div class="fields">
+          <label class="field full">Cú đánh trong video
+            <select id="selStroke"></select>
+          </label>
+          <div class="field">Tay thuận
+            <div class="seg" id="handSeg" role="group" aria-label="Tay thuận">
+              <button data-hand="right" aria-pressed="true">Phải</button>
+              <button data-hand="left" aria-pressed="false">Trái</button>
+            </div>
+          </div>
+          <label class="field">Trình độ
+            <select id="selLevel">
+              <option>Mới bắt đầu</option>
+              <option selected>Trung bình</option>
+              <option>Nâng cao</option>
+            </select>
+          </label>
+        </div>
+        <button class="primary" id="btnAnalyze" disabled><svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7zM19 15l1 2.6 2.6 1-2.6 1L19 22l-1-2.4-2.6-1 2.6-1z"/></svg>Phân tích động tác</button>
+        <p class="ai-note" id="aiNote">Hãy chọn một video để bắt đầu.</p>
+        <details class="tips">
+          <summary>Mẹo quay video để chấm chính xác</summary>
+          <ul>
+            <li>Quay từ bên hông (phía tay thuận) hoặc từ phía sau, thấy trọn người từ đầu đến chân.</li>
+            <li>Giữ máy cố định ngang hông, cách 4–6 m; quay 60 khung hình/giây nếu được.</li>
+            <li>Cắt đoạn chỉ gồm một cú đánh, từ lúc chuẩn bị đến khi theo vợt xong.</li>
+            <li>Đủ ánh sáng, tránh quay ngược nắng.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="result" id="result" aria-live="polite"></div>
+    </div>
+
+    <div class="card history" id="history" hidden style="margin-top:22px">
+      <h3>Tiến bộ của bạn</h3>
+      <div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Cú đánh</th><th>Điểm</th><th style="width:40%"></th></tr></thead><tbody id="histBody"></tbody></table></div>
+      <p class="ai-note" style="margin-top:8px">Lịch sử chỉ lưu trên trình duyệt này.</p>
+    </div>
+  </section>
+
+  <footer>Mô phỏng minh hoạ cho người chơi thuận tay phải (bật “Người thuận tay trái” để lật hình). Điểm AI mang tính tham khảo; hãy kết hợp với huấn luyện viên trực tiếp.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+/* ---------------- vector math (plain arrays) ---------------- */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const len=a=>Math.hypot(a[0],a[1],a[2]);
+const norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l,a[2]/l];};
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const D2R=Math.PI/180;
+function rotYXZ(ry,rx,rz){ // M = Ry * Rx * Rz
+  const cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx),cz=Math.cos(rz),sz=Math.sin(rz);
+  const Ry=[[cy,0,sy],[0,1,0],[-sy,0,cy]], Rx=[[1,0,0],[0,cx,-sx],[0,sx,cx]], Rz=[[cz,-sz,0],[sz,cz,0],[0,0,1]];
+  return mm(mm(Ry,Rx),Rz);
+}
+function mm(A,B){const C=[[0,0,0],[0,0,0],[0,0,0]];for(let i=0;i<3;i++)for(let j=0;j<3;j++)C[i][j]=A[i][0]*B[0][j]+A[i][1]*B[1][j]+A[i][2]*B[2][j];return C;}
+const mv=(M,v)=>[M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2],M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2],M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]];
+
+/* body dimensions (m) */
+const UA=.30, FA=.27, TH=.45, SH=.44, ANK=.09, SWEET=.47;
+
+function ik(S,T,a,b,pole){
+  let d=sub(T,S), L=len(d); const maxL=a+b-1e-3, minL=Math.abs(a-b)+.02;
+  if(L>maxL){d=mul(norm(d),maxL);L=maxL;} if(L<minL){d=mul(norm(d),minL);L=minL;}
+  const u=norm(d), x=(a*a-b*b+L*L)/(2*L), h=Math.sqrt(Math.max(a*a-x*x,0));
+  let w=sub(pole,mul(u,dot(pole,u))); if(len(w)<1e-5) w=Math.abs(u[1])<.9?cross(u,[0,1,0]):cross(u,[1,0,0]); w=norm(w);
+  return [add(add(S,mul(u,x)),mul(w,h)), add(S,d)];
+}
+
+/* ---------------- stroke library ---------------- */
+const DEF_RE=[-.5,-.8,-.3], DEF_LE=[.5,-.8,-.3];
+const READY={pel:[0,.86,0],py:0,ty:0,lean:12,tilt:0,rh:[-.08,1.0,.3],lhAt:.22,rk:[.1,.45,1],rf:[1,0,0],lF:[.32,0,0],rF:[-.32,0,0],re:DEF_RE,le:DEF_LE};
+const HOP={pel:[0,.93,0],lF:[.32,.05,0],rF:[-.32,.05,0]};
+const SPLIT={pel:[0,.8,.02],lF:[.37,0,.02],rF:[-.37,0,.02]};
+
+const STROKES={
+ forehand:{
+  name:'Thuận tay',en:'Forehand',grip:'Semi-Western (bán Tây)',stance:'Mở hoặc bán mở',
+  side:1, origin:[0,-.5], dur:2.6, contactT:1.5, pathT:[.55,2.05],
+  keys:[
+   {t:0,...READY},{t:.18,...HOP},{t:.36,...SPLIT},
+   {t:.75,pel:[-.05,.83,-.02],py:-45,ty:-85,lean:8,rh:[-.35,1.2,-.05],lhAt:null,lh:[-.22,1.2,.42],rk:[-.15,.8,-.3],rf:[-.2,-.2,1],lF:[.3,0,.18],rF:[-.48,0,-.12]},
+   {t:1.05,pel:[-.06,.82,-.03],py:-50,ty:-95,lean:10,rh:[-.48,1.2,-.38],lh:[-.3,1.25,.55],rk:[.15,.25,-1],rf:[0,-1,.1]},
+   {t:1.32,pel:[-.03,.84,0],py:-25,ty:-55,lean:12,rh:[-.6,.92,-.12],lh:[-.15,1.18,.45],rk:[-.15,-.55,-.8],rf:[-.1,0,1]},
+   {t:1.5,pel:[0,.88,.05],py:10,ty:-5,lean:10,rh:[-.5,1.0,.4],lh:[.22,1.15,.25],rk:[-1,.05,.25],rf:[.1,.05,1],rF:[-.45,.04,-.08]},
+   {t:1.64,pel:[.02,.9,.08],py:25,ty:30,rh:[-.2,1.28,.72],lh:[.35,1.15,.1],rk:[-.55,.6,.55],rf:[.6,-.1,.8]},
+   {t:1.85,pel:[.04,.9,.08],py:40,ty:60,lean:8,rh:[.32,1.45,.2],lh:[.39,1.5,0],rk:[.3,.35,-.9],rf:[-.9,.2,-.2],re:[-.2,.3,1],rF:[-.3,.08,.05]},
+   {t:2.15,pel:[.02,.86,.04],py:15,ty:20,lean:10,rh:[0,1.15,.3],lhAt:.22,rk:[.1,1,0],rf:[0,0,1],re:DEF_RE,lF:[.32,0,.05],rF:[-.33,0,0]},
+   {t:2.6,...READY}
+  ],
+  ball:[{t0:0,t1:1.0,a:[-1.7,1.3,19],b:[-1.0,.03,4.2],h:.9},{t0:1.0,t1:1.5,a:[-1.0,.03,4.2],b:'C',h:.45},{t0:1.5,t1:2.35,a:'C',b:[-.8,.03,20],h:1.4}],
+  phases:[
+   {id:'ready',name:'Tư thế chờ & split-step',t0:0,t1:.5,at:.36,cue:'Hai chân rộng hơn vai, gối chùng, trọng tâm trên mũi chân. Bật nhẹ (split-step) đúng lúc đối thủ chạm bóng.'},
+   {id:'turn',name:'Xoay vai (unit turn)',t0:.5,t1:.95,at:.75,cue:'Vai và hông xoay cùng lúc, vợt đi theo thân. Tay trái duỗi về phía bóng để đo khoảng cách.'},
+   {id:'backswing',name:'Kéo vợt & thả đầu vợt',t0:.95,t1:1.38,at:1.32,cue:'Vợt kéo ra sau thành vòng cung, mặt vợt úp xuống đất, rồi đầu vợt rơi thấp hơn tầm bóng.'},
+   {id:'contact',name:'Tiếp xúc bóng',t0:1.38,t1:1.58,at:1.5,cue:'Chạm bóng trước chân trái, ngang hông. Mặt vợt vuông góc mặt đất, vung từ thấp lên cao.'},
+   {id:'follow',name:'Theo vợt',t0:1.58,t1:2.15,at:1.85,cue:'Vợt đi qua bóng về phía lưới rồi kết thúc qua vai trái, khuỷu tay chỉ về lưới. Tay trái đón cổ vợt.'},
+   {id:'recover',name:'Hồi vị',t0:2.15,t1:2.6,at:2.4,cue:'Thả lỏng, bước về giữa sân và trở lại tư thế chờ.'}
+  ],
+  keyPoints:['Mắt nhìn bóng đến tận điểm tiếp xúc, giữ đầu yên sau khi đánh.','Lực đi theo chuỗi chân → hông → vai → tay; cánh tay là khâu cuối cùng.','Điểm tiếp xúc ở phía trước, cách thân khoảng một cánh tay cộng chiều dài vợt.','Cầm vợt lỏng (khoảng 4/10 lực) để đầu vợt tự tăng tốc.'],
+  mistakes:[
+   {m:'Đánh muộn, chạm bóng sau hông',fix:'Xoay vai ngay khi bóng rời vợt đối thủ; đặt điểm chạm trước chân trái.'},
+   {m:'Chỉ dùng tay, thân không xoay',fix:'Tập vung không bóng thật chậm: hông dẫn trước, vai theo sau, tay sau cùng.'},
+   {m:'Vung phẳng hoặc từ cao xuống, bóng vào lưới',fix:'Để đầu vợt rơi thấp hơn bóng 20–30 cm rồi vung lên (low-to-high) tạo topspin.'},
+   {m:'Đứng thẳng chân',fix:'Hạ trọng tâm trước khi đánh và đẩy chân lên khi vung.'}
+  ],
+  drills:['Vung không bóng (shadow swing) trước gương 3 × 15 lần, dừng 1 giây ở mỗi giai đoạn.','Tự thả bóng bên phải và đánh 30 quả, nhắm qua lưới cao khoảng 1 m.','Đánh chéo sân với bạn tập, đếm số quả liên tục.']
+ },
+ backhand:{
+  name:'Trái tay 2 tay',en:'Two-handed backhand',grip:'Phải Continental, trái Eastern',stance:'Trung lập hoặc bán mở',
+  side:-1, origin:[0,-.5], dur:2.6, contactT:1.5, pathT:[.55,2.05],
+  keys:[
+   {t:0,...READY},{t:.18,...HOP},{t:.36,...SPLIT},
+   {t:.75,pel:[.05,.83,-.02],py:45,ty:90,lean:8,rh:[.3,1.15,-.02],lhAt:.09,rk:[.15,.8,-.35],rf:[.2,-.2,1],lF:[.48,0,-.12],rF:[-.25,0,.2]},
+   {t:1.05,pel:[.06,.82,-.03],py:50,ty:100,lean:10,rh:[.42,1.15,-.3],rk:[-.15,.3,-1],rf:[0,-1,.1]},
+   {t:1.32,pel:[.03,.84,0],py:25,ty:60,lean:12,rh:[.4,.98,0],rk:[.15,-.55,-.8],rf:[.1,0,1]},
+   {t:1.5,pel:[0,.88,.06],py:-10,ty:15,lean:10,rh:[.18,1.04,.42],rk:[1,.05,.25],rf:[-.1,.05,1],lF:[.45,.04,-.1]},
+   {t:1.64,pel:[-.02,.9,.08],py:-25,ty:-10,rh:[0,1.27,.6],rk:[.55,.6,.55],rf:[-.6,-.1,.8]},
+   {t:1.85,pel:[-.04,.9,.08],py:-40,ty:-60,lean:8,rh:[-.3,1.45,.2],rk:[-.3,.35,-.9],rf:[.9,.2,-.2],lF:[.4,.08,.05]},
+   {t:2.15,pel:[-.02,.86,.04],py:-15,ty:-20,lean:10,rh:[-.05,1.15,.3],lhAt:.22,rk:[-.1,1,0],rf:[0,0,1],lF:[.32,0,.05],rF:[-.33,0,0]},
+   {t:2.6,...READY}
+  ],
+  ball:[{t0:0,t1:1.0,a:[1.7,1.3,19],b:[1.0,.03,4.2],h:.9},{t0:1.0,t1:1.5,a:[1.0,.03,4.2],b:'C',h:.45},{t0:1.5,t1:2.35,a:'C',b:[.8,.03,20],h:1.4}],
+  phases:[
+   {id:'ready',name:'Tư thế chờ & split-step',t0:0,t1:.5,at:.36,cue:'Gối chùng, vợt trước ngực, sẵn sàng di chuyển về hai phía.'},
+   {id:'turn',name:'Xoay vai sang trái',t0:.5,t1:.95,at:.75,cue:'Hai tay cùng đưa vợt về sau, vai phải xoay về phía lưới, cằm gần chạm vai phải.'},
+   {id:'backswing',name:'Kéo vợt & hạ đầu vợt',t0:.95,t1:1.38,at:1.32,cue:'Vợt về sau thấp hơn vai, hai tay sát nhau, đầu vợt rơi xuống dưới tầm bóng.'},
+   {id:'contact',name:'Tiếp xúc bóng',t0:1.38,t1:1.58,at:1.5,cue:'Chạm bóng trước hông, ngang chân phải. Tay trái là tay chủ đạo, như một cú thuận tay trái.'},
+   {id:'follow',name:'Theo vợt',t0:1.58,t1:2.15,at:1.85,cue:'Vung qua bóng về phía mục tiêu, kết thúc qua vai phải, vẫn giữ cả hai tay trên cán.'},
+   {id:'recover',name:'Hồi vị',t0:2.15,t1:2.6,at:2.4,cue:'Đổi tay về tư thế chờ và bước về giữa sân.'}
+  ],
+  keyPoints:['Tay trái tạo lực chính, tay phải giữ hướng và độ ổn định.','Bước chân phải chéo về phía bóng khi đánh thế trung lập.','Hai khuỷu tay thả lỏng, không gồng cứng.','Vai xoay đủ khoảng 90° trước khi vung.'],
+  mistakes:[
+   {m:'Xoay vai không đủ, đánh bằng tay',fix:'Khi kéo vợt, để cằm chạm vai phải và lưng hơi quay về phía lưới.'},
+   {m:'Đứng quá gần bóng, khuỷu tay bị kẹt',fix:'Dùng các bước nhỏ để giữ khoảng cách khoảng một sải tay.'},
+   {m:'Buông tay trái quá sớm',fix:'Giữ cả hai tay trên cán đến hết cú theo vợt.'},
+   {m:'Mặt vợt mở, bóng bay cao và dài',fix:'Giữ mặt vợt vuông góc khi chạm, vung theo đường từ thấp lên cao.'}
+  ],
+  drills:['Đánh “thuận tay trái” chỉ bằng tay trái với bóng thả nhẹ, 3 × 10 quả.','Vung không bóng với khăn kẹp dưới nách phải để giữ tay sát thân.','Đánh dọc biên (down the line) 20 quả liên tục.']
+ },
+ serve:{
+  name:'Giao bóng',en:'Serve',grip:'Continental (cầm như cầm búa)',stance:'Platform hoặc pinpoint',
+  side:1, origin:[-.5,-.3], dur:2.8, contactT:1.45, pathT:[.6,2.0], camT:[0,1.45,.4], camR:5.2,
+  keys:[
+   {t:0,pel:[-.02,.92,0],py:-70,ty:-75,lean:5,tilt:0,rh:[-.1,1.1,.25],lh:[-.05,1.1,.45],lhAt:null,rk:[0,.35,1],rf:[1,0,0],lF:[.05,0,.28],rF:[-.1,0,-.3],re:DEF_RE,le:DEF_LE},
+   {t:.35,pel:[-.02,.9,-.08],lean:-3,rh:[-.1,.98,.15],lh:[0,1.0,.32],rk:[0,.1,1]},
+   {t:.55,pel:[-.02,.89,-.06],ty:-82,lean:-5,rh:[-.18,.82,-.05],lh:[-.05,1.45,.38],rk:[-.2,-1,.1],rf:[-1,0,0]},
+   {t:.75,pel:[-.02,.86,-.04],py:-75,ty:-90,lean:-8,tilt:14,rh:[-.25,.88,-.42],lh:[-.1,1.92,.35],rk:[0,-.3,-1],rf:[-1,0,0]},
+   {t:1.05,pel:[-.02,.78,-.02],py:-75,ty:-95,lean:-10,tilt:18,rh:[0,1.52,-.4],lh:[-.1,1.85,.35],rk:[.1,1,.1],rf:[-1,0,0],re:[-1,.3,0]},
+   {t:1.17,pel:[-.02,.84,0],py:-70,ty:-80,lean:-8,tilt:20,rh:[-.03,1.6,-.35],lh:[.05,1.6,.3],rk:[.05,.2,-1],rf:[-1,0,0],re:[-.8,.6,0]},
+   {t:1.28,pel:[-.02,.95,.02],py:-60,ty:-60,lean:-5,tilt:20,rh:[-.05,1.7,-.25],lh:[.15,1.3,.15],rk:[.1,-1,-.25],rf:[-1,0,0],re:[-.3,1,.2],lF:[.05,.02,.28],rF:[-.08,.04,-.25]},
+   {t:1.37,pel:[-.01,1.03,.07],py:-35,ty:-30,lean:2,tilt:14,rh:[-.15,1.95,.05],lh:[.2,1.25,.18],rk:[-.2,.15,-1],rf:[-1,0,0],re:[-.5,.6,.3],lF:[.05,.08,.3],rF:[-.1,.12,-.2]},
+   {t:1.45,pel:[0,1.08,.12],py:-10,ty:-5,lean:12,tilt:8,rh:[-.2,2.08,.38],lh:[.2,1.25,.2],rk:[0,1,.3],rf:[0,-.25,1],re:[-.6,.2,.5],lF:[.05,.12,.35],rF:[-.1,.18,-.15]},
+   {t:1.62,pel:[0,1.0,.35],py:10,ty:25,lean:22,tilt:0,rh:[-.1,1.3,1.0],lh:[.3,1.2,.3],rk:[-.5,-.2,.85],rf:[-.9,.1,-.4],re:DEF_RE,lF:[.03,.08,.55],rF:[-.12,.25,0]},
+   {t:1.95,pel:[.02,.82,.7],py:30,ty:40,lean:30,rh:[.3,.98,.65],lh:[.4,1.1,.6],rk:[.3,-.85,-.3],rf:[-.9,0,.3],lF:[0,0,.75],rF:[-.15,.3,.35]},
+   {t:2.35,pel:[0,.86,.75],py:10,ty:10,lean:14,rh:[-.05,1.0,1.0],lh:[.2,1.05,1.0],rk:[.2,.2,.9],rf:[0,1,0],lF:[.3,0,.8],rF:[-.3,0,.7]},
+   {t:2.8,pel:[0,.86,.75],py:0,ty:0,lean:12,rh:[-.08,1.0,1.05],lhAt:.22,rk:[.1,.45,1],rf:[1,0,0],lF:[.32,0,.75],rF:[-.32,0,.75]}
+  ],
+  ball:[{t0:0,t1:.68,follow:'lh',off:[0,.05,.02]},{t0:.68,t1:1.45,a:{hand:'lh',t:.68},b:'C',h:.95},{t0:1.45,t1:1.9,a:'C',b:[2.6,.03,17.3],h:.32}],
+  phases:[
+   {id:'start',name:'Tư thế ban đầu',t0:0,t1:.45,at:.1,cue:'Đứng nghiêng, chân trái chếch về cột lưới, bóng và vợt cùng ở phía trước.'},
+   {id:'toss',name:'Tung bóng',t0:.45,t1:.9,at:.75,cue:'Tung bằng tay thẳng, nhả bóng ở tầm mắt; bóng lên cao hơn tầm vợt, phía trước và hơi lệch phải.'},
+   {id:'trophy',name:'Tư thế cúp (trophy)',t0:.9,t1:1.15,at:1.05,cue:'Gối chùng, vai trái cao hơn vai phải, khuỷu tay phải ngang vai, tay trái vẫn chỉ lên bóng.'},
+   {id:'drop',name:'Thả vợt sau lưng',t0:1.15,t1:1.38,at:1.28,cue:'Đẩy chân bật lên, vợt rơi xuống sau lưng (racket drop) để có quãng tăng tốc dài.'},
+   {id:'contact',name:'Tiếp xúc bóng',t0:1.38,t1:1.52,at:1.45,cue:'Chạm bóng ở điểm cao nhất, tay duỗi thẳng, bóng ở phía trước đường biên.'},
+   {id:'follow',name:'Lật cổ tay & tiếp đất',t0:1.52,t1:2.8,at:1.62,cue:'Cẳng tay xoay trong (pronation), vợt kết thúc bên trái người, tiếp đất bằng chân trái trong sân.'}
+  ],
+  keyPoints:['Tung bóng ổn định quan trọng hơn vung mạnh.','Lực đến từ đẩy chân và xoay thân, không phải từ vai.','Giữ đầu ngẩng lên đến khi chạm bóng.','Cổ tay thả lỏng để cẳng tay xoay trong tự nhiên.'],
+  mistakes:[
+   {m:'Tung bóng lệch, bóng rơi sau đầu',fix:'Đặt vợt dưới đất trước chân trái, tập tung 20 lần sao cho bóng rơi trúng mặt vợt.'},
+   {m:'Cầm vợt kiểu thuận tay (Eastern/Western)',fix:'Chuyển sang Continental; lúc đầu giao xoáy cắt chậm để làm quen.'},
+   {m:'Không chùng gối, không đẩy chân',fix:'Tập dừng ở tư thế cúp 2 giây rồi bật lên đánh.'},
+   {m:'Hạ tay trái quá sớm, mở vai sớm',fix:'Giữ tay trái chỉ lên bóng cho đến khi vợt bắt đầu rơi sau lưng.'}
+  ],
+  drills:['Ném bóng tennis qua lưới bằng động tác ném xa để cảm nhận chuỗi lực.','Tập tung bóng 3 × 20 lần, bóng rơi đúng một điểm.','Giao từ vạch giao bóng trước, lùi dần về vạch cuối sân.']
+ },
+ volley:{
+  name:'Vô-lê',en:'Forehand volley',grip:'Continental',stance:'Bước chân trái lên trước',
+  side:1, origin:[0,8.9], dur:1.8, contactT:.8, pathT:[.42,1.15],
+  keys:[
+   {t:0,pel:[0,.84,0],py:0,ty:0,lean:14,tilt:0,rh:[-.08,1.12,.36],lhAt:.2,rk:[.05,.7,.75],rf:[1,0,0],lF:[.34,0,0],rF:[-.34,0,0],re:DEF_RE,le:DEF_LE},
+   {t:.14,pel:[0,.9,0],lF:[.34,.05,0],rF:[-.34,.05,0]},
+   {t:.28,pel:[0,.78,.02],lF:[.39,0,.02],rF:[-.39,0,.02]},
+   {t:.55,pel:[-.03,.8,0],py:-25,ty:-45,lean:12,rh:[-.42,1.22,.2],lhAt:null,lh:[-.15,1.2,.5],rk:[-.35,.9,-.1],rf:[-.2,.2,1]},
+   {t:.8,pel:[0,.78,.28],py:-15,ty:-25,lean:14,rh:[-.42,1.2,.58],lh:[-.05,1.15,.45],rk:[-.6,.75,.15],rf:[-.05,.25,1],lF:[.25,0,.62]},
+   {t:.95,pel:[0,.79,.34],rh:[-.4,1.15,.75],rk:[-.55,.75,.3],rf:[0,.3,1]},
+   {t:1.3,pel:[0,.84,.3],py:0,ty:0,lean:14,rh:[-.08,1.12,.66],lhAt:.2,rk:[.05,.7,.75],rf:[1,0,0],lF:[.34,0,.32],rF:[-.34,0,.3]},
+   {t:1.8,pel:[0,.84,0],py:0,ty:0,lean:14,rh:[-.08,1.12,.36],lhAt:.2,rk:[.05,.7,.75],rf:[1,0,0],lF:[.34,0,0],rF:[-.34,0,0]}
+  ],
+  ball:[{t0:0,t1:.8,a:[-.4,1.15,14.8],b:'C',h:.35},{t0:.8,t1:1.35,a:'C',b:[-2.4,.03,9.5],h:.2}],
+  phases:[
+   {id:'ready',name:'Tư thế chờ ở lưới',t0:0,t1:.4,at:.28,cue:'Vợt cao trước ngực, đầu vợt ngang tầm mắt, gối chùng và split-step khi đối thủ đánh.'},
+   {id:'turn',name:'Xoay vai ngắn',t0:.4,t1:.72,at:.55,cue:'Chỉ xoay vai, vợt đặt cạnh vai phải, không kéo ra sau thân.'},
+   {id:'contact',name:'Bước lên & chặn bóng',t0:.72,t1:.9,at:.8,cue:'Bước chân trái lên trước, chạm bóng trước mặt, mặt vợt hơi mở, cổ tay chắc.'},
+   {id:'follow',name:'Đẩy ngắn',t0:.9,t1:1.15,at:.95,cue:'Đẩy vợt một đoạn ngắn về mục tiêu, không vung.'},
+   {id:'recover',name:'Hồi vị',t0:1.15,t1:1.8,at:1.4,cue:'Đưa vợt về trước ngực, sẵn sàng cho quả tiếp theo.'}
+  ],
+  keyPoints:['Ngắn gọn: chặn bóng, không vung.','Đầu vợt luôn cao hơn cổ tay.','Lực đến từ bước chân lên trước.','Giữ vợt trong tầm nhìn suốt cú đánh.'],
+  mistakes:[
+   {m:'Vung vợt quá lớn',fix:'Tập đứng lưng sát tường hoặc hàng rào để không thể kéo vợt ra sau.'},
+   {m:'Đầu vợt rơi thấp hơn cổ tay',fix:'Với bóng thấp, chùng gối hạ người thay vì hạ đầu vợt.'},
+   {m:'Đứng chôn chân',fix:'Luôn split-step rồi bước chéo về phía bóng.'}
+  ],
+  drills:['Vô-lê qua lại với bạn tập ở cự ly gần, 2 × 3 phút.','Bạn tập tung bóng bằng tay, bạn chặn 20 quả mỗi bên.','Bắt bóng bằng tay không ở tư thế vô-lê để cảm nhận điểm chạm.']
+ },
+ slice:{
+  name:'Trái tay cắt',en:'One-handed slice',grip:'Continental',stance:'Bước chéo chân phải (đóng)',
+  side:-1, origin:[0,-.5], dur:2.6, contactT:1.48, pathT:[.55,2.05],
+  keys:[
+   {t:0,...READY},{t:.18,...HOP},{t:.36,...SPLIT},
+   {t:.75,pel:[.05,.84,-.02],py:50,ty:95,lean:8,rh:[.25,1.35,-.05],lhAt:.22,rk:[.2,.75,-.55],rf:[.3,.6,.6],lF:[.45,0,-.1],rF:[-.2,0,.15]},
+   {t:1.05,pel:[.06,.83,-.03],py:55,ty:105,rh:[.42,1.42,-.28],lhAt:.2,rk:[.25,.55,-.8],rf:[.2,.75,.5],rF:[-.1,0,.3]},
+   {t:1.3,pel:[.03,.84,.05],py:30,ty:55,lean:10,rh:[.45,1.15,.1],lhAt:null,lh:[.15,1.2,-.25],rk:[.6,.5,-.6],rf:[-.1,.6,.75],rF:[.02,0,.45]},
+   {t:1.48,pel:[0,.86,.12],py:10,ty:20,lean:12,rh:[.3,1.0,.55],lh:[.5,1.15,-.35],rk:[.95,.15,.2],rf:[0,.5,1],rF:[.05,0,.5]},
+   {t:1.65,py:5,ty:10,rh:[.05,1.2,.75],lh:[.6,1.2,-.4],rk:[.7,.45,.55],rf:[-.4,.6,.6]},
+   {t:1.9,ty:5,rh:[-.05,1.32,.72],lh:[.6,1.22,-.38],rk:[.5,.7,.5],rf:[-.5,.6,.5]},
+   {t:2.2,pel:[0,.86,.1],py:0,ty:0,lean:12,rh:[-.08,1.0,.4],lhAt:.22,rk:[.1,.45,1],rf:[1,0,0],lF:[.32,0,.1],rF:[-.32,0,.1]},
+   {t:2.6,...READY}
+  ],
+  ball:[{t0:0,t1:.95,a:[1.5,1.4,19],b:[.9,.03,4.6],h:.9},{t0:.95,t1:1.48,a:[.9,.03,4.6],b:'C',h:.5},{t0:1.48,t1:2.5,a:'C',b:[1.2,.03,19],h:.55}],
+  phases:[
+   {id:'ready',name:'Tư thế chờ & split-step',t0:0,t1:.5,at:.36,cue:'Gối chùng, đổi sang cầm Continental ngay khi nhận ra bóng bên trái.'},
+   {id:'turn',name:'Xoay vai, vợt lên cao',t0:.5,t1:1.1,at:1.05,cue:'Vợt kéo lên cao sau vai trái, tay trái đỡ cổ vợt, mặt vợt mở.'},
+   {id:'backswing',name:'Vung từ cao xuống',t0:1.1,t1:1.4,at:1.3,cue:'Vợt đi chéo từ cao xuống thấp, tay trái bắt đầu tách ra phía sau.'},
+   {id:'contact',name:'Tiếp xúc bóng',t0:1.4,t1:1.56,at:1.48,cue:'Chạm bóng trước chân phải, tay duỗi thẳng, mặt vợt hơi mở.'},
+   {id:'follow',name:'Đẩy theo bóng',t0:1.56,t1:2.15,at:1.9,cue:'Vợt đi dài về mục tiêu, kết thúc ngang ngực; tay trái giữ phía sau để thăng bằng.'},
+   {id:'recover',name:'Hồi vị',t0:2.15,t1:2.6,at:2.4,cue:'Trở lại tư thế chờ và bước về giữa sân.'}
+  ],
+  keyPoints:['Hai tay tách ra hai hướng như mở cánh khi chạm bóng.','Vợt đi dài qua bóng, không chặt mạnh xuống.','Vai phải hướng về lưới cho đến sau khi chạm bóng.','Bóng cắt tốt bay thấp sát lưới và nảy thấp.'],
+  mistakes:[
+   {m:'Chặt bóng quá dốc, bóng nổi hoặc rơi lưới',fix:'Hình dung vợt trượt dưới bóng rồi đi thẳng về mục tiêu.'},
+   {m:'Mở vai sớm',fix:'Giữ tay trái phía sau đến hết cú đánh.'},
+   {m:'Cổ tay lỏng, mặt vợt lật',fix:'Giữ cổ tay chắc, cảm giác tay và vợt là một khối.'}
+  ],
+  drills:['Đánh cắt qua lại ở nửa sân (mini-tennis) với bóng thấp.','Đặt mục tiêu: bóng qua lưới không cao quá 50 cm.','Xen kẽ trái tay 2 tay và trái tay cắt để làm quen việc đổi cú.']
+ }
+};
+const ORDER=['forehand','backhand','serve','volley','slice'];
+
+/* ---------------- keyframe prep & evaluation ---------------- */
+const VEC=['pel','rh','lh','rk','rf','lF','rF','re','le','rkp','lkp'], SCL=['py','ty','lean','tilt','tw','pl','pt','rYo','lYo'];
+function prepStroke(s){
+  let prev={py:0,ty:0,lean:10,tilt:0,tw:0,pl:0,pt:0,rYo:0,lYo:0,rkp:[-.15,0,1],lkp:[.15,0,1],re:DEF_RE,le:DEF_LE,lhAt:null,lh:[0,1,.4],rk:[0,1,0],rf:[1,0,0]};
+  for(const k of s.keys){
+    for(const f of [...VEC,...SCL]) if(k[f]===undefined) k[f]=prev[f];
+    if(k.lhAt===undefined) k.lhAt=prev.lhAt;
+    if(k.lhAt!=null) k.lh=add(k.rh,mul(norm(k.rk),k.lhAt));
+    prev=k;
+  }
+  if(s.contactT!=null){
+    s.contactRig=computeRig(sampleKeys(s.keys,s.contactT));
+    s.contactPos=s.cUp?add(s.contactRig.sweet,[0,.045,0]):add(s.contactRig.sweet,mul(s.contactRig.rkN,.035));
+  }
+  const resolve=p=>{
+    if(p==='C') return s.contactPos;
+    if(p&&p.hand){const r=computeRig(sampleKeys(s.keys,p.t));return add(p.hand==='lh'?r.lHand:r.rHand,[0,.05,.02]);}
+    return p;
+  };
+  s.ballSegs=(s.ball||[]).map(g=>({...g,A:g.follow?null:resolve(g.a),B:g.follow?null:resolve(g.b)}));
+  if(s.pathT){const pts=[];const N=140;
+  for(let i=0;i<=N;i++){const t=s.pathT[0]+(s.pathT[1]-s.pathT[0])*i/N;pts.push(computeRig(sampleKeys(s.keys,t)).sweet);}
+  s.path=pts;}
+}
+const cr=(p0,p1,p2,p3,s)=>.5*((2*p1)+(-p0+p2)*s+(2*p0-5*p1+4*p2-p3)*s*s+(-p0+3*p1-3*p2+p3)*s*s*s);
+function sampleKeys(ks,t){
+  const n=ks.length;
+  if(t<=ks[0].t) return ks[0];
+  if(t>=ks[n-1].t) return ks[n-1];
+  let i=0; while(i<n-2&&t>=ks[i+1].t) i++;
+  const s=(t-ks[i].t)/(ks[i+1].t-ks[i].t);
+  const k0=ks[Math.max(i-1,0)],k1=ks[i],k2=ks[i+1],k3=ks[Math.min(i+2,n-1)];
+  const o={};
+  for(const f of SCL) o[f]=cr(k0[f],k1[f],k2[f],k3[f],s);
+  for(const f of VEC) o[f]=[0,1,2].map(j=>cr(k0[f][j],k1[f][j],k2[f][j],k3[f][j],s));
+  return o;
+}
+function computeRig(p){
+  const r={};
+  const Rt=mm(rotYXZ(p.ty*D2R,p.lean*D2R,p.tilt*D2R),rotYXZ((p.tw||0)*D2R,0,0)), Rp=rotYXZ(p.py*D2R,(p.pl||0)*D2R,(p.pt||0)*D2R);
+  r.Rt=Rt; r.Rp=Rp; r.pel=p.pel;
+  r.chest=add(p.pel,mv(Rt,[0,.5,0]));
+  r.head=add(r.chest,mv(Rt,[0,.25,0]));
+  r.rSh=add(r.chest,mv(Rt,[-.19,0,0])); r.lSh=add(r.chest,mv(Rt,[.19,0,0]));
+  r.rHip=add(p.pel,mv(Rp,[-.1,-.05,0])); r.lHip=add(p.pel,mv(Rp,[.1,-.05,0]));
+  [r.rEl,r.rHand]=ik(r.rSh,p.rh,UA,FA,mv(Rt,p.re));
+  [r.lEl,r.lHand]=ik(r.lSh,p.lh,UA,FA,mv(Rt,p.le));
+  r.rFoot=p.rF; r.lFoot=p.lF;
+  [r.rKnee,r.rAnk]=ik(r.rHip,add(p.rF,[0,ANK,0]),TH,SH,mv(Rp,p.rkp||[-.15,0,1]));
+  [r.lKnee,r.lAnk]=ik(r.lHip,add(p.lF,[0,ANK,0]),TH,SH,mv(Rp,p.lkp||[.15,0,1]));
+  r.rYo=p.rYo||0; r.lYo=p.lYo||0;
+  const d=norm(p.rk); let n=sub(p.rf,mul(d,dot(p.rf,d)));
+  if(len(n)<1e-3) n=Math.abs(d[1])<.9?cross([0,1,0],d):cross([1,0,0],d);
+  n=norm(n);
+  r.rkDir=d; r.rkN=n; r.sweet=add(r.rHand,mul(d,SWEET)); r.py=p.py;
+  return r;
+}
+function ballAt(s,t,rig){
+  for(const g of s.ballSegs){
+    if(t<g.t0||t>g.t1) continue;
+    if(g.follow) return add(g.follow==='lh'?rig.lHand:rig.rHand,g.off);
+    const u=(t-g.t0)/(g.t1-g.t0);
+    const p=add(g.A,mul(sub(g.B,g.A),u)); p[1]+=g.h*4*u*(1-u); return p;
+  }
+  return null;
+}
+ORDER.forEach(k=>prepStroke(STROKES[k]));
+window.__santap={STROKES,sampleKeys,computeRig,ballAt};
+
+/* ---------------- state ---------------- */
+let cur='forehand', time=.36, playing=true, speed=.5, lefty=false, camPreset='side';
+let showPath=true, showContact=true, phaseIdx=-1;
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduceMotion){playing=false;time=STROKES.forehand.contactT;}
+
+/* ---------------- info panel ---------------- */
+function renderTabs(){
+  const box=$('#strokeTabs'); box.textContent='';
+  ORDER.forEach(k=>{
+    const s=STROKES[k], b=el('button','stroke-tab'); b.type='button'; b.setAttribute('role','tab');
+    b.setAttribute('aria-selected',k===cur?'true':'false'); b.dataset.k=k;
+    b.append(el('b',null,s.name),el('small',null,s.en));
+    b.onclick=()=>selectStroke(k);
+    box.append(b);
+  });
+}
+function renderInfo(){
+  const s=STROKES[cur];
+  $('#sEn').textContent=s.en; $('#sName').textContent=s.name; $('#sGrip').textContent=s.grip; $('#sStance').textContent=s.stance;
+  const pl=$('#phaseList'); pl.textContent='';
+  s.phases.forEach((p,i)=>{
+    const li=el('li'), b=el('button'); b.type='button'; b.dataset.i=i;
+    const txt=el('span'); txt.append(el('b',null,p.name),el('small',null,p.cue));
+    b.append(el('span','ph-n',String(i+1)),txt);
+    b.onclick=()=>jumpPhase(i,true);
+    li.append(b); pl.append(li);
+  });
+  const kl=$('#keyList'); kl.textContent=''; s.keyPoints.forEach(t=>kl.append(el('li',null,t)));
+  const ml=$('#mistakeList'); ml.textContent='';
+  s.mistakes.forEach(m=>{const d=el('div','mistake');d.append(el('b',null,m.m),el('p',null,m.fix));ml.append(d);});
+  const dl=$('#drillList'); dl.textContent=''; s.drills.forEach(t=>dl.append(el('li',null,t)));
+  const strip=$('#phaseStrip'); strip.textContent='';
+  s.phases.forEach((p,i)=>{
+    const b=el('button',null,p.name); b.type='button'; b.title=p.name;
+    b.style.left=(p.t0/s.dur*100)+'%'; b.style.width=((p.t1-p.t0)/s.dur*100)+'%';
+    b.onclick=()=>jumpPhase(i,true); strip.append(b);
+  });
+  phaseIdx=-1;
+}
+function updatePhaseUI(){
+  const s=STROKES[cur]; let i=s.phases.findIndex(p=>time>=p.t0&&time<p.t1); if(i<0) i=s.phases.length-1;
+  if(i===phaseIdx) return; phaseIdx=i;
+  const p=s.phases[i];
+  $('#phaseTag').textContent=`Giai đoạn ${i+1}/${s.phases.length}`;
+  $('#phaseName').textContent=p.name; $('#phaseCue').textContent=p.cue;
+  document.querySelectorAll('#phaseList button').forEach((b,j)=>b.classList.toggle('on',j===i));
+  document.querySelectorAll('#phaseStrip button').forEach((b,j)=>b.classList.toggle('on',j===i));
+}
+function setPlaying(v){
+  playing=v;
+  $('#btnPlay').setAttribute('aria-label',v?'Tạm dừng':'Phát');
+  $('#playIcon').innerHTML=v?'<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>':'<path d="M7 4.5v15L19.5 12z"/>';
+}
+function jumpPhase(i,pause){
+  const s=STROKES[cur]; i=(i+s.phases.length)%s.phases.length;
+  time=s.phases[i].at; if(pause) setPlaying(false); dirty=true;
+}
+function selectStroke(k,opts={}){
+  cur=k; renderTabs(); renderInfo();
+  const s=STROKES[k]; time=opts.phase!=null?(s.phases.find(p=>p.id===opts.phase)||s.phases[0]).at:(reduceMotion?s.contactT:s.phases[0].at);
+  if(opts.phase!=null) setPlaying(false);
+  if(gl) gl.onStroke();
+  setCam(camPreset,true); dirty=true; updatePhaseUI();
+}
+
+
+/* ---------------- shared 3D player model ---------------- */
+function makeActor(parent){
+  const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,...o});
+  const M={shirt:mat(0xf3f5f7,{roughness:.7}),trim:mat(0xd3ea3c),shorts:mat(0x1d2c3b),skin:mat(0xc58a64,{roughness:.6}),shoe:mat(0xf7f7f7),sole:mat(0x2d3640),frame:mat(0x1e252d,{roughness:.4,metalness:.2}),grip:mat(0xeeeeee)};
+  const UPV=new THREE.Vector3(0,1,0), tmpV=new THREE.Vector3(), m4=new THREE.Matrix4();
+  const cyl=(r1,r2,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,1,14),m);me.castShadow=true;parent.add(me);return me;};
+  const sph=(r,m)=>{const me=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);me.castShadow=true;parent.add(me);return me;};
+  const setLimb=(me,a,b)=>{const d=sub(b,a),L=len(d);me.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);if(L<1e-6)return;me.scale.set(1,L,1);me.quaternion.setFromUnitVectors(UPV,tmpV.set(d[0]/L,d[1]/L,d[2]/L));};
+  const toM4=R=>m4.set(R[0][0],R[0][1],R[0][2],0,R[1][0],R[1][1],R[1][2],0,R[2][0],R[2][1],R[2][2],0,0,0,0,1);
+  const P={
+    torso:cyl(.17,.135,M.shirt), shoulders:cyl(.075,.075,M.shirt), hips:cyl(.13,.14,M.shorts), neck:cyl(.05,.055,M.skin),
+    rUA:cyl(.052,.046,M.skin), rSleeve:cyl(.064,.06,M.shirt), rFA:cyl(.043,.034,M.skin), lUA:cyl(.052,.046,M.skin), lSleeve:cyl(.064,.06,M.shirt), lFA:cyl(.043,.034,M.skin),
+    rTh:cyl(.075,.058,M.skin), rShort:cyl(.088,.08,M.shorts), rSh:cyl(.055,.04,M.skin), lTh:cyl(.075,.058,M.skin), lShort:cyl(.088,.08,M.shorts), lSh:cyl(.055,.04,M.skin),
+    rEl:sph(.046,M.skin), lEl:sph(.046,M.skin), rKn:sph(.058,M.skin), lKn:sph(.058,M.skin), rHand:sph(.045,M.skin), lHand:sph(.045,M.skin),
+    rShJ:sph(.072,M.shirt), lShJ:sph(.072,M.shirt)
+  };
+  const head=new THREE.Group(); parent.add(head);
+  const skull=new THREE.Mesh(new THREE.SphereGeometry(.11,20,16),M.skin); skull.castShadow=true; head.add(skull);
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(.116,20,10,0,Math.PI*2,0,Math.PI/2.1),M.trim); cap.position.y=.012; head.add(cap);
+  const visor=new THREE.Mesh(new THREE.BoxGeometry(.17,.012,.1),M.trim); visor.position.set(0,.03,.12); head.add(visor);
+  const shoe=()=>{const g=new THREE.Group();const up=new THREE.Mesh(new THREE.BoxGeometry(.1,.07,.27),M.shoe);up.position.y=.05;up.castShadow=true;const so=new THREE.Mesh(new THREE.BoxGeometry(.105,.022,.28),M.sole);so.position.y=.011;g.add(up,so);parent.add(g);return g;};
+  const rShoe=shoe(), lShoe=shoe();
+  const racket=new THREE.Group(); parent.add(racket);
+  const gripM=new THREE.Mesh(new THREE.CylinderGeometry(.017,.019,.27,10),M.grip); gripM.position.y=.04; racket.add(gripM);
+  const HC=.49, RY=.165, RZ=.128;
+  [.012,-.012].forEach(z=>{const a=[0,.17,z],b=[0,HC-RY+.01,z>0?.075:-.075];const t=new THREE.Mesh(new THREE.CylinderGeometry(.009,.009,1,8),M.frame);const d=sub(b,a),L=len(d);t.position.set(...mul(add(a,b),.5));t.scale.y=L;t.quaternion.setFromUnitVectors(UPV,new THREE.Vector3(...norm(d)));racket.add(t);});
+  const ell=[];for(let i=0;i<64;i++){const a=i/64*Math.PI*2;ell.push(new THREE.Vector3(0,HC+RY*Math.cos(a),RZ*Math.sin(a)));}
+  const hoop=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ell,true),80,.011,8,true),M.frame); hoop.castShadow=true; racket.add(hoop);
+  const sp=[];
+  for(let z=-.11;z<=.111;z+=.022){const h=RY*Math.sqrt(Math.max(0,1-(z/RZ)**2));sp.push(0,HC-h,z,0,HC+h,z);}
+  for(let y=-.14;y<=.141;y+=.022){const w=RZ*Math.sqrt(Math.max(0,1-(y/RY)**2));sp.push(0,HC+y,-w,0,HC+y,w);}
+  const sg=new THREE.BufferGeometry(); sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));
+  racket.add(new THREE.LineSegments(sg,new THREE.LineBasicMaterial({color:0xe6edf2,transparent:true,opacity:.75})));
+  const bed=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.08,side:THREE.DoubleSide,depthWrite:false}));
+  bed.scale.set(RZ,RY,1); bed.rotation.y=Math.PI/2; bed.position.y=HC; racket.add(bed);
+  const rkMat=new THREE.Matrix4();
+  const part=(a,b,f)=>add(a,mul(sub(b,a),f));
+  function update(r,o={}){
+    setLimb(P.torso,r.pel,r.chest);
+    P.torso.quaternion.setFromRotationMatrix(toM4(r.Rt)); P.torso.scale.set(1,.56,.66); P.torso.position.set(...add(r.pel,mv(r.Rt,[0,.24,0])));
+    setLimb(P.shoulders,r.rSh,r.lSh);
+    const hipC=add(r.pel,mv(r.Rp,[0,-.02,0]));
+    setLimb(P.hips,add(hipC,mv(r.Rp,[0,-.08,0])),add(hipC,mv(r.Rp,[0,.12,0]))); P.hips.scale.x=1.15; P.hips.scale.z=.8;
+    P.hips.quaternion.setFromRotationMatrix(toM4(r.Rp));
+    setLimb(P.neck,r.chest,add(r.chest,mv(r.Rt,[0,.14,0])));
+    head.position.set(...r.head); head.quaternion.setFromRotationMatrix(toM4(r.Rt));
+    setLimb(P.rUA,r.rSh,r.rEl); setLimb(P.rSleeve,r.rSh,part(r.rSh,r.rEl,.5)); setLimb(P.rFA,r.rEl,r.rHand);
+    setLimb(P.lUA,r.lSh,r.lEl); setLimb(P.lSleeve,r.lSh,part(r.lSh,r.lEl,.5)); setLimb(P.lFA,r.lEl,r.lHand);
+    setLimb(P.rTh,r.rHip,r.rKnee); setLimb(P.rShort,r.rHip,part(r.rHip,r.rKnee,.55)); setLimb(P.rSh,r.rKnee,r.rAnk);
+    setLimb(P.lTh,r.lHip,r.lKnee); setLimb(P.lShort,r.lHip,part(r.lHip,r.lKnee,.55)); setLimb(P.lSh,r.lKnee,r.lAnk);
+    [['rEl','rEl'],['lEl','lEl'],['rKn','rKnee'],['lKn','lKnee'],['rHand','rHand'],['lHand','lHand'],['rShJ','rSh'],['lShJ','lSh']].forEach(([m,k])=>P[m].position.set(...r[k]));
+    const spl=o.shoeSplay||0;
+    rShoe.position.set(...r.rFoot); rShoe.rotation.set(0,(r.py+r.rYo)*D2R-spl,0);
+    lShoe.position.set(...r.lFoot); lShoe.rotation.set(0,(r.py+r.lYo)*D2R+spl,0);
+    racket.visible=o.racket!==false;
+    if(racket.visible){const z3=cross(r.rkN,r.rkDir);rkMat.makeBasis(new THREE.Vector3(...r.rkN),new THREE.Vector3(...r.rkDir),new THREE.Vector3(...z3));racket.quaternion.setFromRotationMatrix(rkMat);racket.position.set(...r.rHand);}
+  }
+  return {update,racket};
+}
+/* ---------------- 3D ---------------- */
+let gl=null, dirty=true;
+function cssColor(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()||'#dde6ee';}
+function initGL(){
+  if(!window.THREE) throw new Error('no three');
+  const canvas=$('#c3d'), viewer=$('#viewer');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,1.4,.05,140);
+  const V3=(a)=>new THREE.Vector3(a[0],a[1],a[2]);
+
+  scene.add(new THREE.HemisphereLight(0xffffff,0x3a4a5a,.85));
+  const sun=new THREE.DirectionalLight(0xffffff,.95); sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024); Object.assign(sun.shadow.camera,{left:-3,right:3,top:3,bottom:-3,near:.5,far:20}); sun.shadow.bias=-.0008; sun.shadow.camera.updateProjectionMatrix();
+  scene.add(sun,sun.target);
+
+  /* court */
+  const court=new THREE.Group(); scene.add(court);
+  const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,...o});
+  const surround=new THREE.Mesh(new THREE.PlaneGeometry(40,60),mat(0x2c6a50)); surround.rotation.x=-Math.PI/2; surround.position.set(0,0,11.9); surround.receiveShadow=true; court.add(surround);
+  const surf=new THREE.Mesh(new THREE.PlaneGeometry(10.97,23.77),mat(0x1f4f88)); surf.rotation.x=-Math.PI/2; surf.position.set(0,.002,11.885); surf.receiveShadow=true; court.add(surf);
+  const lineMat=new THREE.MeshStandardMaterial({color:0xf4f7fa,roughness:.8});
+  const line=(x1,z1,x2,z2)=>{const w=.05,dx=x2-x1,dz=z2-z1,L=Math.hypot(dx,dz);const m=new THREE.Mesh(new THREE.PlaneGeometry(dx?L+w:w,dz?L+w:w),lineMat);m.rotation.x=-Math.PI/2;m.position.set((x1+x2)/2,.004,(z1+z2)/2);m.receiveShadow=true;court.add(m);};
+  const D=5.485,S=4.115,Lz=23.77,net=11.885,sv=6.4;
+  line(-D,0,D,0);line(-D,Lz,D,Lz);line(-D,0,-D,Lz);line(D,0,D,Lz);line(-S,0,-S,Lz);line(S,0,S,Lz);
+  line(-S,net-sv,S,net-sv);line(-S,net+sv,S,net+sv);line(0,net-sv,0,net+sv);line(0,0,0,.12);line(0,Lz-.12,0,Lz);
+  const netMesh=new THREE.Mesh(new THREE.PlaneGeometry(12.8,.94),new THREE.MeshStandardMaterial({color:0x11181f,transparent:true,opacity:.5,side:THREE.DoubleSide}));
+  netMesh.position.set(0,.47,net); court.add(netMesh);
+  const tape=new THREE.Mesh(new THREE.BoxGeometry(12.8,.05,.02),mat(0xffffff)); tape.position.set(0,.93,net); court.add(tape);
+  [-6.4,6.4].forEach(x=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.07,10),mat(0x1d2a35));p.position.set(x,.535,net);p.castShadow=true;court.add(p);});
+
+  /* player */
+  const player=new THREE.Group(); scene.add(player);
+  const actor=makeActor(player);
+
+  /* ball, paths, contact marker */
+  const ball=new THREE.Mesh(new THREE.SphereGeometry(.034,20,14),new THREE.MeshStandardMaterial({color:0xd6ee3a,roughness:.55,emissive:0x2a3300}));
+  ball.castShadow=true; player.add(ball);
+  const pathGeo=new THREE.BufferGeometry(), pathLine=new THREE.Line(pathGeo,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.42}));
+  pathLine.frustumCulled=false; player.add(pathLine);
+  const TRN=24, trailGeo=new THREE.BufferGeometry(); trailGeo.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(TRN*3),3));
+  const trail=new THREE.Line(trailGeo,new THREE.LineBasicMaterial({color:0xf4c534})); trail.frustumCulled=false; player.add(trail);
+  const marker=new THREE.Mesh(new THREE.RingGeometry(.055,.075,36),new THREE.MeshBasicMaterial({color:0xf4c534,transparent:true,opacity:.95,side:THREE.DoubleSide,depthWrite:false}));
+  player.add(marker);
+  const markerDot=new THREE.Mesh(new THREE.SphereGeometry(.012,10,8),new THREE.MeshBasicMaterial({color:0xf4c534})); player.add(markerDot);
+
+  function onStroke(){
+    const s=STROKES[cur];
+    player.position.set(s.origin[0],0,s.origin[1]);
+    player.scale.x=lefty?-1:1;
+    pathGeo.setFromPoints(s.path.map(V3));
+    marker.position.set(...s.contactPos); markerDot.position.set(...s.contactPos);
+    sun.position.set(player.position.x-3.5,8,player.position.z+2.5); sun.target.position.copy(player.position); sun.target.updateMatrixWorld();
+  }
+  function applyTheme(){const c=new THREE.Color(cssColor('--sky'));scene.background=c;scene.fog=new THREE.Fog(c,22,60);dirty=true;}
+
+  function pose(t){
+    const s=STROKES[cur], r=computeRig(sampleKeys(s.keys,t));
+    actor.update(r,{shoeSplay:.12});
+    const b=ballAt(s,t,r); ball.visible=!!b; if(b) ball.position.set(...b);
+    // trail
+    const inPath=t>=s.pathT[0]&&t<=s.pathT[1]; trail.visible=showPath&&inPath; pathLine.visible=showPath;
+    if(trail.visible){const arr=trailGeo.attributes.position.array;for(let i=0;i<TRN;i++){const tt=Math.max(s.pathT[0],t-.22*(1-i/(TRN-1)));const q=computeRig(sampleKeys(s.keys,tt)).sweet;arr.set(q,i*3);}trailGeo.attributes.position.needsUpdate=true;}
+    marker.visible=markerDot.visible=showContact;
+    const near=Math.abs(t-s.contactT)<.05; marker.scale.setScalar(near?1.6:1);
+  }
+
+  /* camera orbit */
+  const cam={th:0,ph:12,r:4.4,tTh:0,tPh:12,tR:4.4};
+  function presetVals(name){
+    const s=STROKES[cur], sg=s.side*(lefty?-1:1), R=s.camR||4.4;
+    return {side:[-78*sg,10,R],back:[180,14,R+.4],front:[-20*sg,10,R+.8],top:[180-25*sg,68,R+1.2]}[name];
+  }
+  function setCamInner(name,instant){const v=presetVals(name);cam.tTh=v[0];cam.tPh=v[1];cam.tR=v[2];
+    let d=((cam.tTh-cam.th)%360+540)%360-180; cam.th=cam.tTh-d;
+    if(instant){cam.th=cam.tTh;cam.ph=cam.tPh;cam.r=cam.tR;} dirty=true;}
+  function placeCam(){
+    const s=STROKES[cur], T=s.camT||[0,1.05,.3];
+    const tx=player.position.x+T[0]*(lefty?-1:1), ty=T[1], tz=player.position.z+T[2];
+    const ph=cam.ph*D2R, th=cam.th*D2R;
+    camera.position.set(tx+cam.r*Math.cos(ph)*Math.sin(th),ty+cam.r*Math.sin(ph),tz+cam.r*Math.cos(ph)*Math.cos(th));
+    camera.lookAt(tx,ty,tz);
+  }
+  // pointer orbit
+  const pts=new Map(); let pinch0=0;
+  viewer.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;viewer.focus({preventScroll:true});pts.set(e.pointerId,{x:e.clientX,y:e.clientY});viewer.setPointerCapture(e.pointerId);if(pts.size===2){const [a,b]=[...pts.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);}});
+  viewer.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+    if(pts.size===2){p.x=e.clientX;p.y=e.clientY;const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0){cam.tR=cam.r=Math.min(10,Math.max(2,cam.r*pinch0/d));}pinch0=d;dirty=true;return;}
+    const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+    cam.th-=dx*.45; cam.ph=Math.min(85,Math.max(-4,cam.ph+dy*.3)); cam.tTh=cam.th; cam.tPh=cam.ph; dirty=true; markCam(null);});
+  const up=e=>{pts.delete(e.pointerId);pinch0=0;};
+  viewer.addEventListener('pointerup',up); viewer.addEventListener('pointercancel',up);
+  viewer.addEventListener('wheel',e=>{if(document.activeElement!==viewer)return;e.preventDefault();cam.r=cam.tR=Math.min(10,Math.max(2,cam.r*(1+e.deltaY*.0012)));dirty=true;},{passive:false});
+
+  function resize(){const w=viewer.clientWidth,h=viewer.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();dirty=true;}
+  new ResizeObserver(resize).observe(viewer); resize();
+
+  let visible=true;
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:0}).observe(viewer);
+
+  function render(){
+    pose(time); placeCam();
+    marker.quaternion.copy(camera.quaternion);
+    renderer.render(scene,camera);
+  }
+  let last=performance.now();
+  function loop(now){
+    const dt=Math.min((now-last)/1000,.05); last=now;
+    const s=STROKES[cur];
+    if(playing&&visible&&!document.hidden){time+=dt*speed;if(time>=s.dur)time-=s.dur;dirty=true;}
+    const k=1-Math.pow(.0015,dt);
+    if(Math.abs(cam.th-cam.tTh)>.05||Math.abs(cam.ph-cam.tPh)>.05||Math.abs(cam.r-cam.tR)>.005){cam.th+=(cam.tTh-cam.th)*k;cam.ph+=(cam.tPh-cam.ph)*k;cam.r+=(cam.tR-cam.r)*k;dirty=true;}
+    if(dirty&&visible){render();dirty=false;$('#scrub').value=Math.round(time/s.dur*1000);updatePhaseUI();}
+    requestAnimationFrame(loop);
+  }
+
+  // snapshots of the model for the example result
+  function snapshots(key,times){
+    const keep={cur,time,cam:{...cam},lefty};
+    cur=key; lefty=false; onStroke();
+    const v=presetVals('side'); cam.th=v[0]+18; cam.ph=8; cam.r=v[2]-.3;
+    const out=times.map(t=>{time=t;render();return renderer.domElement.toDataURL('image/jpeg',.82);});
+    cur=keep.cur; time=keep.time; Object.assign(cam,keep.cam); lefty=keep.lefty; onStroke(); dirty=true;
+    return out;
+  }
+
+  applyTheme();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+  new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  onStroke(); setCamInner(camPreset,true);
+  requestAnimationFrame(loop);
+  return {onStroke,setCam:setCamInner,snapshots};
+}
+function markCam(name){document.querySelectorAll('#camCtl button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cam===name?'true':'false'));}
+function setCam(name,instant){camPreset=name;markCam(name);if(gl)gl.setCam(name,instant);}
+
+/* controls */
+$('#btnPlay').onclick=()=>{setPlaying(!playing);dirty=true;};
+$('#btnPrev').onclick=()=>jumpPhase((phaseIdx<0?0:phaseIdx)-1,true);
+$('#btnNext').onclick=()=>jumpPhase((phaseIdx<0?0:phaseIdx)+1,true);
+$('#scrub').addEventListener('input',e=>{time=e.target.value/1000*STROKES[cur].dur;setPlaying(false);dirty=true;updatePhaseUI();});
+document.querySelectorAll('#speedSeg button').forEach(b=>b.onclick=()=>{speed=+b.dataset.speed;document.querySelectorAll('#speedSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));if(!playing)setPlaying(true);});
+document.querySelectorAll('#camCtl button').forEach(b=>b.onclick=()=>setCam(b.dataset.cam));
+$('#tgPath').onchange=e=>{showPath=e.target.checked;dirty=true;};
+$('#tgContact').onchange=e=>{showContact=e.target.checked;dirty=true;};
+$('#tgLefty').onchange=e=>{lefty=e.target.checked;if(gl){gl.onStroke();gl.setCam(camPreset);}dirty=true;};
+$('#viewer').addEventListener('keydown',e=>{
+  if(e.key===' '){e.preventDefault();setPlaying(!playing);dirty=true;}
+  else if(e.key==='ArrowRight'){e.preventDefault();jumpPhase(phaseIdx+1,true);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();jumpPhase(phaseIdx-1,true);}
+});
+
+renderTabs(); renderInfo(); setPlaying(playing);
+try{ gl=initGL(); }catch(err){ $('#glFail').hidden=false; console.warn(err); }
+updatePhaseUI();
+
+/* ================= AI COACH ================= */
+const CRIT=[
+  {k:'prep',label:'Chuẩn bị & di chuyển chân',desc:'tư thế chờ, split-step, bước chân điều chỉnh, khoảng cách tới bóng'},
+  {k:'turn',label:'Xoay vai & kéo vợt',desc:'unit turn, độ xoay vai/hông, quỹ đạo kéo vợt, vị trí tay không cầm vợt'},
+  {k:'contact',label:'Điểm tiếp xúc',desc:'vị trí chạm bóng so với thân, độ cao, mặt vợt, cánh tay và cổ tay lúc chạm'},
+  {k:'follow',label:'Theo vợt & kết thúc',desc:'đường vung qua bóng, điểm kết thúc, hồi vị'},
+  {k:'balance',label:'Thăng bằng & chuỗi lực',desc:'trọng tâm, chuyển lực chân → hông → vai → tay, giữ đầu ổn định'}
+];
+const PHASE_NAME=id=>{for(const k of ORDER){const p=STROKES[k].phases.find(x=>x.id===id);if(p)return p.name;}return id;};
+let sample=null, imgLimits=null, aiState='loading', videoFile=null, videoURL=null, hand='right', ctl=null, lastFrames=[];
+
+const selStroke=$('#selStroke');
+selStroke.append(new Option('Tự nhận diện','auto'));
+ORDER.forEach(k=>selStroke.append(new Option(`${STROKES[k].name} (${STROKES[k].en})`,k)));
+selStroke.value='forehand';
+document.querySelectorAll('#handSeg button').forEach(b=>b.onclick=()=>{hand=b.dataset.hand;document.querySelectorAll('#handSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));});
+
+function note(msg,err){const n=$('#aiNote');n.textContent=msg;n.classList.toggle('err',!!err);}
+function refreshAnalyze(){
+  const ok=aiState==='ready'&&!!videoFile&&!ctl;
+  $('#btnAnalyze').disabled=!ok;
+  if(ctl) return;
+  if(aiState==='loading') note(videoFile?'Đang kết nối với Claude…':'Hãy chọn một video để bắt đầu.');
+  else if(aiState==='absent') note('Tính năng chấm điểm AI chỉ chạy khi mở trang này trong Claude. Phần mô phỏng 3D vẫn dùng được.',true);
+  else if(aiState==='noimages') note('Phiên bản Claude đang mở trang này chưa cho phép gửi hình ảnh, nên chưa chấm điểm video được.',true);
+  else if(aiState==='denied') note('Bạn đã không cho phép trang này dùng Claude, nên tính năng chấm điểm đang tắt. Tải lại trang để được hỏi lại.',true);
+  else note(videoFile?`Sẵn sàng. AI sẽ xem ${frameCount()} khung hình trong đoạn đã chọn.`:'Hãy chọn một video để bắt đầu.');
+}
+function frameCount(){return Math.max(2,Math.min(8,imgLimits?.maxCount||6));}
+(async()=>{
+  try{
+    if(!window.claude?.use){aiState='absent';refreshAnalyze();return;}
+    sample=await window.claude.use('sample');
+    if(!sample){aiState='absent';refreshAnalyze();return;}
+    const lim=await sample.limits().catch(()=>null);
+    imgLimits=lim?.images||null;
+    aiState=imgLimits?'ready':'noimages';
+  }catch(e){aiState='absent';}
+  refreshAnalyze();
+})();
+
+/* video input */
+const vid=$('#vid'), fileIn=$('#file'), drop=$('#drop');
+const fmt=t=>t.toFixed(1)+' s';
+function loadVideo(f){
+  if(!f) return;
+  if(!/^video\//.test(f.type)&&!/\.(mp4|mov|m4v|webm|ogv)$/i.test(f.name)){note('Tệp này không phải video. Hãy chọn tệp MP4, MOV hoặc WebM.',true);return;}
+  if(videoURL) URL.revokeObjectURL(videoURL);
+  videoFile=f; videoURL=URL.createObjectURL(f); vid.src=videoURL;
+  drop.hidden=true; $('#vidWrap').hidden=false; $('#vidInfo').textContent=f.name;
+  refreshAnalyze();
+}
+vid.addEventListener('loadedmetadata',()=>{
+  const d=vid.duration||0; const rs=$('#rngStart'), re=$('#rngEnd');
+  rs.max=re.max=d.toFixed(1); rs.value=0; re.value=d.toFixed(1);
+  $('#vidInfo').textContent=`${videoFile.name} · ${fmt(d)} · ${vid.videoWidth}×${vid.videoHeight}`;
+  updTrim();
+});
+vid.addEventListener('error',()=>{note('Trình duyệt không đọc được định dạng video này. Hãy thử xuất lại sang MP4 (H.264).',true);videoFile=null;$('#btnAnalyze').disabled=true;});
+fileIn.addEventListener('change',()=>loadVideo(fileIn.files[0]));
+$('#btnChange').onclick=()=>fileIn.click();
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',e=>loadVideo(e.dataTransfer.files[0]));
+function updTrim(src){
+  const rs=$('#rngStart'), re=$('#rngEnd'); let a=+rs.value, b=+re.value;
+  if(b-a<.5){ if(src==='s') a=Math.max(0,b-.5); else b=Math.min(+re.max,a+.5); rs.value=a; re.value=b; }
+  $('#outStart').textContent=fmt(a); $('#outEnd').textContent=fmt(b);
+  const w=$('#trimWarn'); const span=b-a;
+  w.hidden=span<=10; w.textContent=span>10?`Đoạn đang chọn dài ${fmt(span)}. Hãy thu hẹp quanh một cú đánh để AI thấy rõ từng giai đoạn.`:'';
+}
+$('#rngStart').addEventListener('input',()=>{updTrim('s');vid.currentTime=+$('#rngStart').value;});
+$('#rngEnd').addEventListener('input',()=>{updTrim('e');vid.currentTime=+$('#rngEnd').value;});
+
+function seek(t){return new Promise(res=>{let done=false;const fin=()=>{if(done)return;done=true;vid.removeEventListener('seeked',fin);res();};vid.addEventListener('seeked',fin);vid.currentTime=t;setTimeout(fin,4000);});}
+async function extractFrames(n,onStep){
+  vid.pause();
+  const a=+$('#rngStart').value, b=Math.min(+$('#rngEnd').value,(vid.duration||0)-.03);
+  const W=Math.min(768,vid.videoWidth||768), H=Math.round(W*(vid.videoHeight||432)/(vid.videoWidth||768));
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const out=[];
+  for(let i=0;i<n;i++){
+    const t=a+(b-a)*(n===1?0:i/(n-1)); onStep&&onStep(i+1,n);
+    await seek(Math.max(0,t)); g.drawImage(vid,0,0,W,H);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+    if(!blob) throw {code:'frame'};
+    out.push({t,blob,url:URL.createObjectURL(blob)});
+  }
+  return out;
+}
+
+function buildPrompt(strokeKey,frames,level){
+  const handTxt=hand==='right'?'phải':'trái';
+  const times=frames.map((f,i)=>`khung ${i+1}: ${f.t.toFixed(2)} s`).join('; ');
+  const ref=k=>{const s=STROKES[k];return `### ${s.name} (${s.en}) — stroke_key "${k}"
+Cách cầm vợt chuẩn: ${s.grip}. Thế chân: ${s.stance}.
+Các giai đoạn (id: tên — yêu cầu):
+${s.phases.map(p=>`- ${p.id}: ${p.name} — ${p.cue}`).join('\n')}
+Lưu ý chính: ${s.keyPoints.join(' ')}
+Lỗi hay gặp: ${s.mistakes.map(m=>m.m).join('; ')}.`;};
+  const refs=strokeKey==='auto'?ORDER.map(ref).join('\n\n'):ref(strokeKey);
+  return `Bạn là huấn luyện viên tennis chuyên nghiệp, đang chấm kỹ thuật cho học viên qua video.
+
+Ảnh đính kèm là ${frames.length} khung hình theo đúng thứ tự thời gian, trích đều từ một đoạn video (${times}).
+Học viên thuận tay ${handTxt}${hand==='left'?' (hãy đối chiếu chuẩn kỹ thuật theo hướng đối xứng gương)':''}, tự đánh giá trình độ: ${level}.
+${strokeKey==='auto'?'Học viên không nói rõ cú đánh. Hãy tự nhận diện cú đánh (một trong các cú dưới đây) rồi chấm theo chuẩn của cú đó.':`Học viên cho biết đây là cú: ${STROKES[strokeKey].name} (${STROKES[strokeKey].en}).`}
+
+CHUẨN KỸ THUẬT THAM CHIẾU
+${refs}
+
+CÁCH CHẤM: 5 tiêu chí, mỗi tiêu chí 0–20 điểm (tổng 100):
+${CRIT.map(c=>`- ${c.k} (${c.label}): ${c.desc}`).join('\n')}
+Thang tham khảo cho mỗi tiêu chí: 18–20 chuẩn như tuyển thủ; 14–17 tốt, lỗi nhỏ; 10–13 có lỗi rõ ràng; 5–9 lỗi lớn; 0–4 sai cơ bản hoặc không thấy được.
+
+QUY TẮC
+- Chỉ nhận xét những gì thật sự nhìn thấy trong ảnh. Nếu một giai đoạn không có trong khung hình hoặc bị che, nói rõ trong note và chấm thận trọng.
+- Mỗi lỗi phải gắn với số khung hình (1–${frames.length}) nơi thấy rõ nhất và id giai đoạn tương ứng.
+- Nếu ảnh không cho thấy người đang đánh tennis, đặt "valid": false và giải thích ngắn trong "reason".
+- Nếu cú đánh thực tế khác cú học viên đã chọn, ghi cú thực tế vào "stroke_key" và chấm theo cú thực tế.
+- Viết tiếng Việt, ngắn gọn, cụ thể, giọng huấn luyện viên khích lệ. Mỗi câu nhận xét tối đa khoảng 30 từ.
+- Tối đa 4 lỗi, xếp theo mức độ ảnh hưởng giảm dần. 2–3 bài tập phù hợp trình độ.
+
+Trả lời CHỈ bằng một đối tượng JSON, đúng cấu trúc sau:
+{"valid":true,"reason":"","stroke_key":"forehand|backhand|serve|volley|slice","summary":"2–3 câu tổng quan","level_estimate":"Mới bắt đầu|Trung bình|Khá|Nâng cao","scores":{"prep":{"score":0,"note":""},"turn":{"score":0,"note":""},"contact":{"score":0,"note":""},"follow":{"score":0,"note":""},"balance":{"score":0,"note":""}},"strengths":["..."],"errors":[{"title":"","frame":1,"phase":"<id giai đoạn>","severity":"cao|vừa|thấp","detail":"điều thấy trong khung hình","fix":"cách sửa cụ thể"}],"drills":[{"name":"","how":""}],"priority":"Một việc quan trọng nhất cần sửa trước"}`;
+}
+
+function normalizeResult(r,fallbackKey){
+  if(!r||typeof r!=='object') throw {code:'invalid_json'};
+  const out={valid:r.valid!==false,reason:String(r.reason||''),summary:String(r.summary||''),priority:String(r.priority||''),level_estimate:String(r.level_estimate||'')};
+  out.stroke_key=ORDER.includes(r.stroke_key)?r.stroke_key:(fallbackKey==='auto'?'forehand':fallbackKey);
+  out.scores=CRIT.map(c=>{const v=r.scores?.[c.k]||{};const n=Math.round(Math.min(20,Math.max(0,+v.score||0)));return {...c,score:n,note:String(v.note||'')};});
+  out.overall=out.scores.reduce((a,b)=>a+b.score,0);
+  out.strengths=(Array.isArray(r.strengths)?r.strengths:[]).map(String).slice(0,5);
+  out.errors=(Array.isArray(r.errors)?r.errors:[]).slice(0,4).map(e=>({title:String(e.title||'Lỗi kỹ thuật'),frame:Math.round(+e.frame)||0,phase:String(e.phase||''),severity:['cao','vừa','thấp'].includes(String(e.severity).toLowerCase())?String(e.severity).toLowerCase():'vừa',detail:String(e.detail||''),fix:String(e.fix||'')}));
+  out.drills=(Array.isArray(r.drills)?r.drills:[]).slice(0,4).map(d=>({name:String(d.name||''),how:String(d.how||'')}));
+  return out;
+}
+const grade=n=>n>=85?'Xuất sắc':n>=70?'Tốt':n>=55?'Khá':n>=40?'Cần cải thiện':'Mới làm quen';
+const barColor=v=>v>=16?'var(--good)':v>=11?'var(--court-ink)':v>=7?'var(--warn)':'var(--bad)';
+
+function renderResult(res,frames,opts={}){
+  const box=$('#result'); box.textContent='';
+  const badge=el('span','res-badge'+(opts.example?'':' mine'),opts.example?'Ví dụ · kết quả mẫu':'Kết quả của bạn · '+new Date().toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}));
+  box.append(badge);
+  if(opts.example){box.append(el('p','ai-note','Đây là ví dụ minh hoạ dùng khung hình từ mô hình 3D. Tải video của bạn lên để nhận kết quả thật.'));}
+  if(!res.valid){
+    const d=el('div','invalid');d.append(el('b',null,'AI chưa chấm được video này. '),document.createTextNode(res.reason||'Khung hình không cho thấy rõ một cú đánh tennis.'),el('p','ai-note','Hãy thử quay lại theo các mẹo bên trái, hoặc thu hẹp đoạn video quanh cú đánh.'));
+    box.append(d); if(frames.length) box.append(framesStrip(frames,[],opts)); return;
+  }
+  const s=STROKES[res.stroke_key];
+  const board=el('div','board');
+  const left=el('div'); left.append(el('div','lbl','Điểm kỹ thuật'));
+  const big=el('div','big',String(res.overall)); big.append(el('small',null,'/100')); left.append(big);
+  const right=el('div','board-r'); right.append(el('div','grade',grade(res.overall)));
+  const meta=el('div','board-meta'); meta.append(el('span',null,s.name)); if(res.level_estimate) meta.append(el('span',null,'Trình độ ước tính: '+res.level_estimate)); right.append(meta);
+  if(res.summary) right.append(el('p',null,res.summary));
+  board.append(left,right); box.append(board);
+  if(frames.length) box.append(framesStrip(frames,res.errors.map(e=>e.frame),opts));
+
+  const sc=el('div','card'); sc.append(el('h3',null,'Điểm từng tiêu chí'));
+  const subs=el('div','subs');
+  res.scores.forEach(c=>{const d=el('div','sub');const o=el('output',null,String(c.score));o.append(el('small',null,' /20'));
+    const bar=el('div','bar'),i=el('i');i.style.width=(c.score/20*100)+'%';i.style.background=barColor(c.score);bar.append(i);
+    d.append(el('b',null,c.label),o,bar); if(c.note) d.append(el('p',null,c.note)); subs.append(d);});
+  sc.append(subs);
+  if(res.priority){const p=el('p','priority');p.append(el('b',null,'Ưu tiên sửa trước: '),document.createTextNode(res.priority));sc.append(p);}
+  box.append(sc);
+
+  if(res.strengths.length){const c=el('div','card');c.append(el('h3',null,'Điểm làm tốt'));const ul=el('ul','strengths');res.strengths.forEach(t=>ul.append(el('li',null,t)));c.append(ul);box.append(c);}
+  if(res.errors.length){
+    const c=el('div','card');c.append(el('h3',null,'Lỗi cần sửa'));const list=el('div','errs');
+    res.errors.forEach(e=>{
+      const d=el('div','err');d.dataset.sev=e.severity;
+      d.append(el('h4',null,e.title));
+      const see=el('button','see','Xem mẫu 3D');see.type='button';see.onclick=()=>{
+        if($('#tgLefty').checked!==(hand==='left'&&!opts.example)){$('#tgLefty').checked=hand==='left'&&!opts.example;lefty=$('#tgLefty').checked;}
+        selectStroke(res.stroke_key,{phase:s.phases.some(p=>p.id===e.phase)?e.phase:s.phases.find(p=>p.id==='contact')?.id});
+        $('#mo-phong').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});};
+      d.append(see);
+      const tags=el('div','err-tags');tags.append(el('span','chip sev','Mức '+e.severity));
+      if(e.frame&&frames[e.frame-1]){const fb=el('button','chip',`Khung ${e.frame} · ${frames[e.frame-1].t.toFixed(1)} s`);fb.type='button';fb.onclick=()=>focusFrame(e.frame,opts);tags.append(fb);}
+      else if(e.frame) tags.append(el('span','chip','Khung '+e.frame));
+      if(e.phase) tags.append(el('span','chip',PHASE_NAME(e.phase)));
+      d.append(tags);
+      if(e.detail) d.append(el('p','detail',e.detail));
+      if(e.fix) d.append(el('p','fix',e.fix));
+      list.append(d);
+    });
+    c.append(list);box.append(c);
+  }
+  if(res.drills.length){const c=el('div','card');c.append(el('h3',null,'Bài tập cho bạn'));const g=el('div','drill-cards');res.drills.forEach(d=>{const x=el('div','drill');x.append(el('b',null,d.name),el('p',null,d.how));g.append(x);});c.append(g);box.append(c);}
+}
+function framesStrip(frames,flagged,opts){
+  const g=el('div','frames');
+  frames.forEach((f,i)=>{const b=el('button','frame'+(flagged.includes(i+1)?' flag':''));b.type='button';b.dataset.i=i+1;
+    const img=el('img');img.src=f.url;img.alt=`Khung ${i+1}`;b.append(img,el('span',null,`${i+1} · ${f.t.toFixed(1)}s`));
+    b.onclick=()=>focusFrame(i+1,opts);g.append(b);});
+  return g;
+}
+function focusFrame(n,opts){
+  document.querySelectorAll('.frame').forEach(f=>f.classList.toggle('hl',+f.dataset.i===n));
+  if(!opts.example&&lastFrames[n-1]&&!vid.closest('[hidden]')){vid.pause();vid.currentTime=lastFrames[n-1].t;vid.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});}
+}
+
+function showStatus(title,sub,stoppable){
+  const box=$('#result'); box.textContent='';
+  const s=el('div','status');const sp=el('span','spin');const t=el('div');t.append(el('b',null,title),el('small',null,sub||''));s.append(sp,t);
+  if(stoppable){const b=el('button',null,'Dừng');b.type='button';b.onclick=()=>ctl?.abort();s.append(b);}
+  box.append(s); return t.querySelector('small');
+}
+const ERR_MSG={
+  not_granted:'Bạn chưa cho phép trang dùng Claude, nên không thể chấm điểm.',
+  sampling_disabled:'Claude chưa khả dụng cho tài khoản này.',
+  rate_limited:'Bạn đã gửi quá nhiều yêu cầu hoặc chạm giới hạn sử dụng. Hãy thử lại sau ít phút.',
+  session_expired:'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại Claude rồi thử lại.',
+  image_rejected:'Khung hình không hợp lệ. Hãy thử một video khác (MP4).',
+  images_unavailable:'Phiên bản Claude này chưa cho phép gửi hình ảnh.',
+  refused:'AI từ chối phân tích nội dung này. Hãy thử một video khác.',
+  invalid_json:'AI trả về kết quả không đúng định dạng. Hãy bấm phân tích lại.',
+  empty_completion:'AI không trả lời. Hãy thử thu hẹp đoạn video rồi phân tích lại.',
+  prompt_too_large:'Dữ liệu gửi đi quá lớn. Hãy rút ngắn đoạn video.',
+  frame:'Không trích được khung hình từ video này. Hãy thử xuất lại sang MP4 (H.264).'
+};
+$('#btnAnalyze').onclick=async()=>{
+  if(!sample||!videoFile||ctl) return;
+  const strokeKey=selStroke.value, level=$('#selLevel').value, n=frameCount();
+  ctl=new AbortController(); $('#btnAnalyze').disabled=true; note('Đang phân tích…');
+  let timer=null;
+  try{
+    const sub=showStatus('Đang trích khung hình…','',false);
+    lastFrames.forEach(f=>URL.revokeObjectURL(f.url));
+    const frames=await extractFrames(n,(i,t)=>{sub.textContent=`Khung ${i}/${t}`;});
+    lastFrames=frames;
+    const sub2=showStatus('AI đang xem động tác của bạn…','Thường mất 20–60 giây',true);
+    $('#result').append(framesStrip(frames,[],{}));
+    const t0=Date.now(); timer=setInterval(()=>{sub2.textContent=`Đã chờ ${Math.round((Date.now()-t0)/1000)} giây · thường mất 20–60 giây`;},1000);
+    const raw=await sample.json(buildPrompt(strokeKey,frames,level),{images:frames.map(f=>f.blob),signal:ctl.signal});
+    const res=normalizeResult(raw,strokeKey);
+    renderResult(res,frames,{});
+    if(res.valid) saveHist({d:Date.now(),k:res.stroke_key,n:res.overall});
+    note('Xong. Bấm vào khung hình hoặc lỗi để xem lại trong video.');
+  }catch(e){
+    const code=e?.code||'upstream_error';
+    if(code==='not_granted'||code==='sampling_disabled'||code==='not_declared'||code==='capability_disabled') aiState='denied';
+    if(code==='images_unavailable') aiState='noimages';
+    const msg=code==='cancelled'?'Đã dừng phân tích.':(ERR_MSG[code]||'Kết nối với AI bị gián đoạn. Hãy bấm phân tích lại.');
+    const box=$('#result'); box.textContent=''; const d=el('div','invalid'); d.append(el('b',null,code==='cancelled'?'Đã dừng. ':'Chưa chấm được. '),document.createTextNode(msg)); box.append(d);
+    if(lastFrames.length) box.append(framesStrip(lastFrames,[],{}));
+    note(msg,code!=='cancelled');
+  }finally{
+    clearInterval(timer); ctl=null; refreshAnalyze();
+  }
+};
+
+/* history (per-browser convenience) */
+const HK='santap-history-v1';
+function loadHist(){try{return JSON.parse(localStorage.getItem(HK)||'[]')||[];}catch{return [];}}
+function saveHist(e){try{const h=loadHist();h.unshift(e);localStorage.setItem(HK,JSON.stringify(h.slice(0,12)));}catch{}renderHist();}
+function renderHist(){
+  const h=loadHist(); $('#history').hidden=!h.length; const tb=$('#histBody'); tb.textContent='';
+  h.forEach(r=>{const tr=el('tr');const bar=el('span','mini'),i=el('i');i.style.width=r.n+'%';bar.append(i);
+    const td=el('td');td.append(bar);
+    tr.append(el('td',null,new Date(r.d).toLocaleDateString('vi-VN')),el('td',null,STROKES[r.k]?.name||r.k),el('td','n',String(r.n)),td);tb.append(tr);});
+}
+renderHist();
+
+/* example result */
+const EXAMPLE={valid:true,stroke_key:'forehand',level_estimate:'Trung bình',
+  summary:'Cú thuận tay có nền tảng tốt ở khâu chuẩn bị và kết thúc. Điểm cần cải thiện nhất là thời điểm xoay vai và vị trí tiếp xúc, hiện đang hơi muộn.',
+  priority:'Xoay vai sớm hơn, ngay khi bóng rời vợt đối thủ.',
+  scores:{prep:{score:15,note:'Tư thế chờ thấp, split-step đúng nhịp; bước điều chỉnh cuối hơi ngắn.'},turn:{score:12,note:'Vai xoay khoảng 60°, vợt kéo về sau chủ yếu bằng tay.'},contact:{score:13,note:'Chạm bóng gần ngang hông thay vì trước chân trái.'},follow:{score:16,note:'Theo vợt trọn qua vai trái, khuỷu tay chỉ về lưới.'},balance:{score:13,note:'Đầu ngả ra sau lúc chạm bóng, trọng tâm dồn về chân sau.'}},
+  strengths:['Tư thế chờ thấp, sẵn sàng di chuyển.','Kết thúc cú đánh trọn vẹn, tay trái đón cổ vợt.'],
+  errors:[
+    {title:'Điểm tiếp xúc hơi muộn',frame:4,phase:'contact',severity:'cao',detail:'Bóng được chạm gần ngang hông, mặt vợt bị mở nên bóng dễ bay dài.',fix:'Đặt điểm chạm sớm hơn khoảng 30 cm; tập tự thả bóng với một quả mốc đặt trước chân trái.'},
+    {title:'Xoay vai chưa đủ, kéo vợt bằng tay',frame:2,phase:'turn',severity:'vừa',detail:'Vai mới xoay một phần, vợt tách khỏi thân và đi ra sau bằng cánh tay.',fix:'Xoay vai trái về phía bóng trước, để vợt và tay trái đi cùng thân.'},
+    {title:'Đầu vợt chưa rơi thấp hơn bóng',frame:3,phase:'backswing',severity:'thấp',detail:'Đường vung khá phẳng nên bóng ít xoáy.',fix:'Hạ đầu vợt dưới tầm bóng 20–30 cm rồi mới vung lên.'}],
+  drills:[{name:'Vung không bóng 3 nhịp',how:'Xoay vai, thả vợt, vung; dừng 1 giây mỗi nhịp, 3 × 10 lần.'},{name:'Tự thả bóng có mốc',how:'Đặt bóng mốc trước chân trái, thả bóng và chạm ngay trên mốc, 30 quả.'}]};
+let exFrames=[];
+if(gl){try{const ts=[.36,.75,1.32,1.5,1.64,1.85];exFrames=gl.snapshots('forehand',ts).map((url,i)=>({t:ts[i],url}));}catch(e){exFrames=[];}}
+renderResult(normalizeResult(EXAMPLE,'forehand'),exFrames,{example:true});
+refreshAnalyze();
+/* ================= FOOTWORK ================= */
+const FW={
+ split:{name:'Bật chờ',en:'Split-step',when:'Mỗi lần đối thủ chạm bóng, trước mọi cú đánh.',
+  feet:[['L',4.2,6,-6,0],['R',5.8,6,6,0],['L',3.5,6,-12,1],['R',6.5,6,12,1]],arrows:[[4.1,7.4,3.2,7.4],[5.9,7.4,6.8,7.4]],
+  steps:['Tư thế chờ: gối chùng, trọng tâm trên mũi chân.','Bật nhẹ 3–5 cm đúng lúc đối thủ chạm bóng; tiếp đất cả hai mũi chân cùng lúc, rộng hơn vai.'],
+  mis:'Bật quá cao, hoặc bật muộn khiến lúc tiếp đất bóng đã qua lưới.'},
+ shuffle:{name:'Trượt ngang',en:'Side shuffle',when:'Di chuyển 2–4 m để đón bóng hoặc hồi vị.',
+  feet:[['L',3.4,6,0,0],['R',5.0,6,0,0],['R',6.5,6,0,1],['L',4.9,6,0,2],['R',8.1,6,0,3],['L',6.5,6,0,4]],arrows:[[3.4,7.5,8.6,7.5]],
+  steps:['Chân phía hướng đi (chân phải) bước trước.','Chân kia trượt theo, không chạm vào chân trước.','Lặp lại; hông giữ ngang, đầu không nhấp nhô.'],
+  mis:'Hai chân chạm hoặc bắt chéo nhau; đứng thẳng người.'},
+ crossover:{name:'Bước bắt chéo',en:'Crossover step',when:'Bóng rộng, cần đi xa thật nhanh.',
+  feet:[['L',3.4,6,0,0],['R',5.0,6,0,0],['R',5.3,6,65,1],['L',7.0,5.7,60,2],['R',8.6,5.9,45,3],['L',7.4,4.9,10,4]],arrows:[[3.6,7.4,8.8,7.4]],ball:[9.6,4.3],
+  steps:['Xoay mũi chân phải mở về hướng bóng.','Chân trái bắt chéo phía trước, đẩy mạnh.','Bước dài chân phải để đặt trụ.','Chân trái đặt xuống: đánh ở thế mở.'],
+  mis:'Chạy thẳng người mà không xoay hông và chân trước.'},
+ dropstep:{name:'Bước xoay lùi',en:'Drop step',when:'Bóng sâu, bóng bổng buộc phải lùi.',
+  feet:[['L',4.2,4.6,0,0],['R',5.8,4.6,0,0],['R',6.6,6.0,120,1],['L',5.8,7.4,100,2],['R',7.4,8.0,80,3],['L',5.6,8.6,20,4]],arrows:[[5.2,5.2,7.8,9.2]],ball:[8.8,8.0],
+  steps:['Xoay hông, chân phải bước lùi chéo ra sau.','Chân trái bắt chéo lùi tiếp.','Chân phải đặt trụ phía sau bóng.','Dồn trọng tâm lên chân trước khi đánh.'],
+  mis:'Chạy lùi bằng gót chân, dễ mất thăng bằng và ngã.'},
+ carioca:{name:'Bước đan chéo',en:'Carioca',when:'Khởi động, rèn phối hợp hông – chân và di chuyển ngang dài.',
+  feet:[['L',2.6,6,0,0],['R',4.0,6,0,0],['L',5.2,5.6,0,1],['R',6.3,6,0,2],['L',7.3,6.5,0,3],['R',8.5,6,0,4]],arrows:[[2.6,7.6,8.8,7.6]],
+  steps:['Chân trái bắt chéo phía trước chân phải.','Chân phải bước ngang.','Chân trái bắt chéo phía sau.','Chân phải bước ngang, lặp lại.'],
+  mis:'Vai xoay theo chân; vai phải luôn hướng về phía lưới.'},
+ adjust:{name:'Bước điều chỉnh',en:'Adjustment steps',when:'Ngay trước khi đánh, để đứng đúng khoảng cách với bóng.',
+  feet:[['L',3.4,6.4,0,0],['R',4.8,6.4,0,0],['R',5.3,6.1,0,1],['L',3.9,6.0,0,2],['R',5.7,5.7,10,3],['L',4.3,5.6,0,4],['R',6.1,5.4,25,5],['L',5.2,4.9,-15,6]],ball:[8.0,4.0],
+  steps:['Bước ngắn, nhanh, liên tục khi bóng đến gần.','Dừng khi bóng cách người khoảng một sải tay cộng chiều dài vợt.','Bóng nằm phía trước chân trái lúc chạm.'],
+  mis:'Dừng chân quá sớm, đến khi đánh lại phải với tay hoặc ngả người.'},
+ recovery:{name:'Hồi vị',en:'Recovery',when:'Ngay sau mỗi cú đánh, để về vị trí giữa.',
+  feet:[['L',7.4,5.6,25,0],['R',9.0,6.0,45,0],['R',6.9,5.8,-40,1],['L',5.6,6.0,-15,2],['R',6.6,6.0,0,3],['L',4.2,6.0,0,4],['R',5.8,6.0,0,4]],arrows:[[8.8,7.4,4.0,7.4]],
+  steps:['Chân phải bắt chéo, đẩy người về phía giữa sân.','Trượt ngang 1–2 bước.','Split-step khi đối thủ chạm bóng.'],
+  mis:'Đứng nhìn theo bóng sau khi đánh.'},
+ approach:{name:'Tiến lên lưới',en:'Approach & volley',when:'Sau bóng ngắn, lên lưới để vô-lê.',
+  feet:[['L',4.3,9.2,0,0],['R',5.7,9.2,0,0],['R',5.8,8.0,0,1],['L',4.4,6.8,0,2],['R',5.8,5.6,0,3],['L',4.1,4.6,-8,4],['R',5.9,4.6,8,4],['L',6.4,3.3,35,5]],arrows:[[3.2,9.4,3.2,4.4]],ball:[7.6,2.4],net:true,
+  steps:['Chạy tiến 3 bước, người thấp dần.','Split-step đúng lúc đối thủ chạm bóng.','Bước chân trái chéo lên khi vô-lê thuận tay.'],
+  mis:'Lao thẳng vào lưới mà không split-step, bị bóng vượt qua người.'}
+};
+const STANCES=[
+ {name:'Mở',en:'Open',feet:[['L',4.0,5.6,-10],['R',6.8,5.6,20]],note:'Bóng rộng, nhanh. Phổ biến ở thuận tay hiện đại.'},
+ {name:'Bán mở',en:'Semi-open',feet:[['L',4.5,4.8,5],['R',6.6,6.1,30]],note:'Linh hoạt nhất cho thuận tay, vừa xoay vừa dồn lực.'},
+ {name:'Trung lập',en:'Neutral',feet:[['L',5.2,3.8,35],['R',5.6,6.5,55]],note:'Bóng vừa tầm; trái tay 2 tay; dồn lực về phía trước.'},
+ {name:'Đóng',en:'Closed',feet:[['L',6.6,3.9,50],['R',4.8,6.3,60]],note:'Trái tay một tay, trái tay cắt; bóng thấp.'}
+];
+const NS='http://www.w3.org/2000/svg';
+const sv=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
+function footprint(f,x,y,r,opts={}){
+  const g=sv('g',{class:'fp',transform:`translate(${x*20+10} ${y*20+10}) rotate(${r}) scale(${opts.scale||1.35})`});
+  const col=f==='L'?'var(--foot-l)':'var(--foot-r)';
+  const st=opts.start?{fill:'none',stroke:'var(--muted)','stroke-dasharray':'2 2','stroke-width':1.2}:{fill:col};
+  const sole=sv('g',{class:'sole'});
+  sole.append(sv('ellipse',{cx:f==='L'?-.6:.6,cy:-3,rx:4.4,ry:6.4,...st}),sv('ellipse',{cx:0,cy:6.2,rx:3.4,ry:3.6,...st}));
+  g.append(sole);
+  return g;
+}
+function fwSVG(p){
+  const s=sv('svg',{viewBox:'0 0 220 220',class:'fw-svg',role:'img','aria-label':'Sơ đồ bước chân: '+p.name});
+  s.append(sv('defs',{}));
+  const mk=sv('marker',{id:'ah-'+p.id,viewBox:'0 0 10 10',refX:8,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'});
+  mk.append(sv('path',{d:'M0 0 L10 5 L0 10 z',fill:'var(--muted)'})); s.firstChild.append(mk);
+  if(p.net){s.append(sv('line',{x1:10,y1:22,x2:210,y2:22,stroke:'var(--muted)','stroke-width':2,'stroke-dasharray':'4 3'}));const t=sv('text',{x:14,y:16,class:'fp-n',fill:'var(--muted)'});t.textContent='LƯỚI';s.append(t);}
+  else{const t=sv('text',{x:110,y:18,'text-anchor':'middle',class:'fp-n',fill:'var(--muted)'});t.textContent='↑ lưới';s.append(t);}
+  (p.arrows||[]).forEach(a=>s.append(sv('line',{x1:a[0]*20+10,y1:a[1]*20+10,x2:a[2]*20+10,y2:a[3]*20+10,stroke:'var(--muted)','stroke-width':1.6,'marker-end':`url(#ah-${p.id})`,opacity:.7})));
+  if(p.ball){s.append(sv('circle',{cx:p.ball[0]*20+10,cy:p.ball[1]*20+10,r:6,fill:'var(--ball)',stroke:'var(--ball-ink)','stroke-width':1}));}
+  const steps=[];
+  p.feet.forEach(([f,x,y,r,n])=>{
+    const g=footprint(f,x,y,r,{start:n===0}); g.dataset.n=n;
+    s.append(g);
+    if(n>0){const b=sv('g',{class:'fp',transform:`translate(${x*20+10+(f==='L'?-17:17)} ${y*20+10-13})`});b.dataset.n=n;
+      b.append(sv('circle',{r:7,class:'fp-badge',stroke:f==='L'?'var(--foot-l)':'var(--foot-r)','stroke-width':1.5}));
+      const t=sv('text',{class:'fp-n','text-anchor':'middle',y:3});t.textContent=n;b.append(t);s.append(b);}
+    steps.push(g);
+  });
+  s.dataset.max=Math.max(...p.feet.map(f=>f[4]));
+  return s;
+}
+function stanceSVG(st){
+  const s=sv('svg',{viewBox:'0 0 220 220',role:'img','aria-label':'Thế chân '+st.name});
+  const t=sv('text',{x:110,y:18,'text-anchor':'middle',class:'fp-n',fill:'var(--muted)'});t.textContent='↑ lưới';s.append(t);
+  s.append(sv('circle',{cx:9.2*20+10,cy:3.6*20+10,r:7,fill:'var(--ball)',stroke:'var(--ball-ink)','stroke-width':1}));
+  st.feet.forEach(([f,x,y,r])=>{s.append(footprint(f,x,y,r,{scale:2.3}));});
+  return s;
+}
+function renderFootwork(){
+  const grid=$('#fwGrid');
+  Object.entries(FW).forEach(([id,p])=>{
+    p.id=id;
+    const c=el('article','fw-card'); c.id='fw-'+id;
+    const top=el('div','fw-top'); top.append(el('h3',null,p.name),el('span','en',p.en)); c.append(top);
+    c.append(fwSVG(p), el('p','fw-when','Dùng khi: '+p.when));
+    const ol=el('ol'); p.steps.forEach(t=>ol.append(el('li',null,t))); c.append(ol);
+    const m=el('p','fw-mis'); m.append(el('b',null,'Lỗi hay gặp: '),document.createTextNode(p.mis)); c.append(m);
+    grid.append(c);
+  });
+  const c=el('article','fw-card wide'); c.id='fw-stance';
+  const top=el('div','fw-top'); top.append(el('h3',null,'Thế chân khi đánh'),el('span','en','Stances · bóng ở bên phải, cú thuận tay')); c.append(top);
+  const row=el('div','stance-row');
+  STANCES.forEach(st=>{const d=el('div','stance');d.append(stanceSVG(st),el('b',null,st.name+' · '+st.en),el('small',null,st.note));row.append(d);});
+  c.append(row); grid.append(c);
+}
+renderFootwork();
+// step-by-step animation for cards on screen
+const fwVisible=new Set();
+const fwIO=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?fwVisible.add(e.target):fwVisible.delete(e.target)),{threshold:.3});
+document.querySelectorAll('.fw-svg').forEach(s=>fwIO.observe(s));
+let fwTick=0;
+function fwPaint(svg,step){svg.querySelectorAll('.fp[data-n]').forEach(g=>{const n=+g.dataset.n;g.classList.toggle('off',n>step&&n>0);g.classList.toggle('now',n===step&&n>0);});}
+if(reduceMotion){document.querySelectorAll('.fw-svg').forEach(s=>fwPaint(s,99));}
+else setInterval(()=>{if(document.hidden)return;fwTick++;fwVisible.forEach(s=>{const m=+s.dataset.max;fwPaint(s,fwTick%(m+3));});},700);
+document.querySelectorAll('.fw-svg').forEach(s=>fwPaint(s,reduceMotion?99:0));
+function goFootwork(id){
+  const c=document.getElementById('fw-'+id); if(!c) return;
+  c.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
+  c.classList.add('flash'); setTimeout(()=>c.classList.remove('flash'),1800);
+}
+
+/* ================= DRILL LIBRARY (3D for every exercise) ================= */
+const STAND={pel:[0,1.0,0],py:0,ty:0,lean:2,tilt:0,tw:0,pl:0,pt:0,rh:[-.25,.88,.05],lh:[.25,.88,.05],lhAt:null,rk:[.05,-1,.25],rf:[1,0,0],lF:[.13,0,0],rF:[-.13,0,0],re:DEF_RE,le:DEF_LE,rkp:[-.15,0,1],lkp:[.15,0,1],rYo:0,lYo:0};
+const st=o=>({...STAND,...o});
+const loop=(keys,t)=>{const k={...keys[0]};k.t=t;keys.push(k);return keys;};
+const scaleKeys=(keys,f)=>keys.map(k=>({...k,t:k.t*f}));
+const PLANK_HI={pel:[0,.47,0],lean:75,pl:75,rh:[-.19,.03,.48],lh:[.19,.03,.48],lF:[.12,0,-.85],rF:[-.12,0,-.85],re:[-.3,0,1],le:[.3,0,1]};
+const ph=(name,t0,t1,cue)=>({id:name,name,t0,t1,at:t0+(t1-t0)*.55,cue});
+
+const DRILLS={
+ jog:{name:'Chạy bước nhỏ tại chỗ',noRacket:true,dur:.8,cam:'cheo',
+  keys:loop([{t:0,...st({pel:[0,.98,0],lean:6,rF:[-.13,.14,.08],rh:[-.24,1.08,.22],lh:[.24,.95,-.12],re:[-.3,-.8,-.5],le:[.3,-.8,-.5]})},
+   {t:.2,pel:[0,1.0,0],rF:[-.13,.02,0],lF:[.13,.02,0]},
+   {t:.4,pel:[0,.98,0],rF:[-.13,0,0],lF:[.13,.14,.08],rh:[-.24,.95,-.12],lh:[.24,1.08,.22]},
+   {t:.6,pel:[0,1.0,0],rF:[-.13,.02,0],lF:[.13,.02,0]}],.8),
+  phases:[ph('Nhịp chạy',0,.8,'Chạm đất bằng mũi chân, gối nâng nhẹ, tay co khoảng 90° và đánh nhịp nhàng ngược với chân.')],
+  tips:'Thở đều bằng mũi, vai thả lỏng, lưng thẳng.'},
+ joints:{name:'Xoay khớp toàn thân',noRacket:true,dur:6.4,cam:'cheo',
+  keys:[{t:0,...st({rh:[-.74,1.66,0],lh:[.74,1.66,0]})},{t:.5,rh:[-.74,1.5,.16],lh:[.74,1.5,.16]},{t:1,rh:[-.74,1.34,0],lh:[.74,1.34,0]},{t:1.5,rh:[-.74,1.5,-.16],lh:[.74,1.5,-.16]},{t:2,rh:[-.74,1.66,0],lh:[.74,1.66,0]},
+   {t:2.5,rh:[-.22,1.0,.02],lh:[.22,1.0,.02],re:[-1,0,-.3],le:[1,0,-.3],lF:[.2,0,0],rF:[-.2,0,0]},{t:2.9,pel:[.07,1,0]},{t:3.3,pel:[0,1,.07]},{t:3.7,pel:[-.07,1,0]},{t:4.1,pel:[0,1,-.07]},
+   {t:4.6,pel:[0,.86,-.1],lean:38,rh:[-.1,.55,.2],lh:[.1,.55,.2],re:DEF_RE,le:DEF_LE,lF:[.08,0,0],rF:[-.08,0,0]},{t:5,pel:[.05,.86,-.08]},{t:5.4,pel:[0,.84,-.04]},{t:5.8,pel:[-.05,.86,-.08]},{t:6.4,pel:[0,1,0],lean:2,rh:[-.74,1.66,0],lh:[.74,1.66,0],lF:[.13,0,0],rF:[-.13,0,0]}],
+  phases:[ph('Vai',0,2.2,'Duỗi thẳng hai tay ngang vai, xoay vòng nhỏ rồi lớn dần, mỗi chiều 10 vòng. Xoay thêm cổ tay và cổ.'),ph('Hông',2.2,4.3,'Hai tay chống hông, xoay hông thành vòng tròn, vai giữ yên.'),ph('Gối và cổ chân',4.3,6.4,'Khép chân, tay đặt lên gối, xoay gối cả hai chiều; sau đó xoay từng cổ chân.')],
+  tips:'Xoay chậm, có kiểm soát; không giật mạnh.'},
+ jack:{name:'Bật nhảy dang tay chân',noRacket:true,dur:1,cam:'truoc',
+  keys:loop([{t:0,...st({lF:[.1,0,0],rF:[-.1,0,0]})},{t:.25,pel:[0,1.08,0],lF:[.25,.08,0],rF:[-.25,.08,0],rh:[-.74,1.62,0],lh:[.74,1.62,0]},{t:.5,pel:[0,.97,0],lF:[.4,0,0],rF:[-.4,0,0],rh:[-.15,2.12,0],lh:[.15,2.12,0]},{t:.75,pel:[0,1.08,0],lF:[.25,.08,0],rF:[-.25,.08,0],rh:[-.74,1.62,0],lh:[.74,1.62,0]}],1),
+  phases:[ph('Bật ra',0,.5,'Bật nhẹ, chân dang rộng hơn vai, hai tay vung qua hai bên lên trên đầu.'),ph('Thu về',.5,1,'Bật thu chân về, tay hạ xuống sát hông. Tiếp đất bằng mũi chân, gối hơi chùng.')],
+  tips:'Giữ nhịp đều; nếu đau gối, bước sang ngang thay vì bật.'},
+ lunge_twist:{name:'Lunge bước tới kèm xoay thân',noRacket:true,dur:3.2,cam:'cheo',
+  keys:loop([{t:0,...st({rh:[-.06,1.25,.38],lh:[.06,1.25,.38],re:[-.6,-.6,-.4],le:[.6,-.6,-.4]})},
+   {t:.8,pel:[0,.6,.12],lF:[.13,0,.72],rF:[-.13,.06,-.48],rkp:[-.15,-1,.2],rh:[-.05,.98,.45],lh:[.05,.98,.45]},
+   {t:1.5,ty:70,rh:[.27,1.0,.27],lh:[.33,1.0,.21]},{t:2.1,ty:0,rh:[-.05,.98,.45],lh:[.05,.98,.45]},
+   {t:2.7,pel:[0,1,0],lF:[.13,0,0],rF:[-.13,0,0],rkp:[-.15,0,1],rh:[-.06,1.25,.38],lh:[.06,1.25,.38]}],3.2),
+  phases:[ph('Bước tới',0,.9,'Bước chân trái dài về trước, hạ người đến khi hai gối gần vuông góc; gối trước không vượt quá mũi chân.'),ph('Xoay thân',.9,2.2,'Giữ hông yên, xoay vai về phía chân trước rồi trở lại.'),ph('Đứng lên',2.2,3.2,'Đẩy gót chân trước để đứng lên, đổi chân.')],
+  tips:'Lưng thẳng, mắt nhìn trước. Làm luân phiên hai chân.'},
+ leg_swing:{name:'Đá lăng chân',noRacket:true,dur:2,cam:'ngang',
+  keys:loop([{t:0,...st({lh:[.75,1.45,0],rF:[-.13,.03,0]})},{t:.5,pel:[0,1,-.03],rF:[-.13,.4,.72]},{t:1,pel:[0,1,0],rF:[-.13,.04,0]},{t:1.5,pel:[0,1,.03],lean:8,rF:[-.13,.25,-.68]}],2),
+  phases:[ph('Lăng trước',0,1,'Đứng vững trên chân trái, đá lăng chân phải ra trước thả lỏng, cao dần.'),ph('Lăng sau',1,2,'Đưa chân ra sau, thân trên giữ thẳng. 10 lần mỗi chân, sau đó lăng sang ngang.')],
+  tips:'Có thể vịn tường để giữ thăng bằng.'},
+ rope:{name:'Nhảy dây',noRacket:true,dur:.5,cam:'cheo',rope:true,
+  keys:loop([{t:0,...st({pel:[0,.99,0],rh:[-.32,.98,.08],lh:[.32,.98,.08],re:[-.8,-.5,-.2],le:[.8,-.5,-.2],lF:[.11,0,0],rF:[-.11,0,0]})},{t:.12,pel:[0,.97,0]},{t:.25,pel:[0,1.06,0],lF:[.11,.07,0],rF:[-.11,.07,0]},{t:.38,pel:[0,.97,0],lF:[.11,0,0],rF:[-.11,0,0]}],.5),
+  phases:[ph('Nhịp nhảy',0,.5,'Bật thấp 2–3 cm bằng mũi chân, quay dây bằng cổ tay, khuỷu tay sát thân.')],
+  tips:'Không có dây thì làm động tác giả, giữ nguyên nhịp.'},
+ inchworm:{name:'Inchworm',noRacket:true,dur:6,cam:'ngang',camT:[0,.6,.5],camR:4,
+  keys:[{t:0,...st({})},{t:1,pel:[0,.97,-.2],lean:125,rh:[-.15,.06,.35],lh:[.15,.06,.35]},{t:2,pel:[0,.62,.35],lean:92,pl:30,rh:[-.19,.04,1.0],lh:[.19,.04,1.0]},
+   {t:3,pel:[0,.45,.78],lean:80,pl:78,rh:[-.19,.03,1.27],lh:[.19,.03,1.27]},{t:3.8,pel:[0,.45,.78]},{t:4.6,pel:[0,.62,.35],lean:92,pl:30,rh:[-.19,.04,1.0],lh:[.19,.04,1.0]},
+   {t:5.3,pel:[0,.97,-.2],lean:125,pl:0,rh:[-.15,.06,.35],lh:[.15,.06,.35]},{t:6,...st({})}],
+  phases:[ph('Gập người',0,1.2,'Đứng thẳng, gập người chạm tay xuống sàn, gối hơi chùng nếu cần.'),ph('Bò tay ra',1.2,3.2,'Bò hai tay ra trước đến tư thế plank, thân thành một đường thẳng.'),ph('Bò tay về',3.2,6,'Giữ 1 giây rồi bò tay về gần chân, cuộn người đứng lên.')],
+  tips:'Siết bụng khi ở tư thế plank, không võng lưng.'},
+ high_knees:{name:'Nâng cao đùi tại chỗ',noRacket:true,dur:.6,cam:'ngang',
+  keys:loop([{t:0,...st({pel:[0,.98,0],lean:4,rF:[-.13,.5,.3],rh:[-.24,1.1,.25],lh:[.24,.95,-.12],re:[-.3,-.8,-.5],le:[.3,-.8,-.5]})},{t:.15,pel:[0,1,0],rF:[-.13,.03,0],lF:[.13,.03,0]},{t:.3,pel:[0,.98,0],rF:[-.13,0,0],lF:[.13,.5,.3],rh:[-.24,.95,-.12],lh:[.24,1.1,.25]},{t:.45,pel:[0,1,0],rF:[-.13,.03,0],lF:[.13,.03,0]}],.6),
+  phases:[ph('Nâng gối',0,.6,'Nâng gối ngang hông, tiếp đất bằng mũi chân, tay đánh mạnh theo nhịp.')],
+  tips:'Thân trên thẳng, không ngả ra sau.'},
+ squat:{name:'Squat',noRacket:true,dur:2.6,cam:'ngang',
+  keys:loop([{t:0,...st({lF:[.2,0,0],rF:[-.2,0,0],rYo:-12,lYo:12,rh:[-.18,1.45,.55],lh:[.18,1.45,.55]})},{t:1.1,pel:[0,.52,-.22],lean:38,rh:[-.18,1.0,.5],lh:[.18,1.0,.5]},{t:1.5,pel:[0,.52,-.22]},{t:2.3,pel:[0,1,0],lean:2,rh:[-.18,1.45,.55],lh:[.18,1.45,.55]}],2.6),
+  phases:[ph('Hạ xuống',0,1.2,'Chân rộng bằng vai, mũi chân hơi mở. Đẩy hông ra sau như ngồi ghế, gối cùng hướng mũi chân.'),ph('Giữ',1.2,1.6,'Đùi gần song song mặt sàn, lưng thẳng, gót không nhấc.'),ph('Đứng lên',1.6,2.6,'Đẩy gót xuống sàn để đứng lên, siết mông ở trên cùng.')],
+  tips:'Hít vào khi xuống, thở ra khi lên.'},
+ plank:{name:'Plank',noRacket:true,dur:3,cam:'ngang',camT:[0,.3,-.1],camR:3.4,mat:true,
+  keys:loop([{t:0,...st({pel:[0,.26,0],lean:78,pl:78,rh:[-.16,.05,.76],lh:[.16,.05,.76],re:[-.3,-.3,1],le:[.3,-.3,1],lF:[.1,0,-.88],rF:[-.1,0,-.88]})},{t:1.5,pel:[0,.28,0]}],3),
+  phases:[ph('Giữ thẳng người',0,3,'Khuỷu tay ngay dưới vai, thân từ đầu đến gót là một đường thẳng; siết bụng và mông.')],
+  tips:'Không võng lưng hay đẩy mông cao. Thở đều.'},
+ calf_raise:{name:'Nhón gót',noRacket:true,dur:2,cam:'ngang',
+  keys:loop([{t:0,...st({})},{t:.8,pel:[0,1.07,0],lF:[.13,.07,0],rF:[-.13,.07,0]},{t:1.2,pel:[0,1.07,0]}],2),
+  phases:[ph('Nhón lên',0,1.2,'Đẩy người lên bằng mũi chân, cao hết mức, giữ 1 giây.'),ph('Hạ xuống',1.2,2,'Hạ gót chậm, có kiểm soát.')],
+  tips:'Có thể đứng trên bậc thang để tăng biên độ.'},
+ calf_single:{name:'Nhón gót một chân',noRacket:true,dur:2,cam:'ngang',
+  keys:loop([{t:0,...st({rF:[-.13,.32,-.22],rkp:[-.15,-1,0],lh:[.6,1.3,.2]})},{t:.8,pel:[0,1.07,0],lF:[.13,.07,0]},{t:1.2,pel:[0,1.07,0]}],2),
+  phases:[ph('Nhón lên',0,1.2,'Đứng một chân, nhón cao hết mức, giữ hông ngang.'),ph('Hạ xuống',1.2,2,'Hạ chậm. Đổi chân sau mỗi hiệp.')],
+  tips:'Vịn nhẹ tường để giữ thăng bằng.'},
+ wall_sit:{name:'Ngồi dựa tường',noRacket:true,dur:3,cam:'ngang',wall:-.43,
+  keys:loop([{t:0,...st({pel:[0,.52,-.25],lean:0,lF:[.17,0,.3],rF:[-.17,0,.3],rh:[-.2,.62,.12],lh:[.2,.62,.12]})},{t:1.5,pel:[0,.51,-.25]}],3),
+  phases:[ph('Giữ tư thế',0,3,'Lưng áp tường, đùi song song sàn, gối vuông góc ngay trên cổ chân.')],
+  tips:'Tay không tì lên đùi nếu muốn khó hơn.'},
+ lateral_lunge:{name:'Lunge sang ngang',noRacket:true,dur:2.6,cam:'truoc',
+  keys:loop([{t:0,...st({lF:[.3,0,0],rF:[-.3,0,0],rh:[-.06,1.25,.35],lh:[.06,1.25,.35],re:[-.6,-.6,-.4],le:[.6,-.6,-.4]})},{t:1.1,pel:[-.42,.62,-.12],lean:30,rF:[-.78,0,0],rYo:-15,lYo:10,rh:[-.38,.98,.32],lh:[-.28,.98,.36]},{t:1.5,pel:[-.42,.62,-.12]},{t:2.3,pel:[0,1,0],lean:2,rF:[-.3,0,0],rYo:0,lYo:0,rh:[-.06,1.25,.35],lh:[.06,1.25,.35]}],2.6),
+  phases:[ph('Bước ngang',0,1.2,'Bước chân phải sang ngang, đẩy hông ra sau, chân trái duỗi thẳng.'),ph('Giữ',1.2,1.6,'Gối phải cùng hướng mũi chân, lưng thẳng.'),ph('Về',1.6,2.6,'Đẩy chân phải về tư thế đứng, đổi bên.')],
+  tips:'Đây là chuyển động giống khi đỡ bóng rộng.'},
+ lunge:{name:'Lunge bước tới',noRacket:true,dur:2.6,cam:'ngang',
+  keys:loop([{t:0,...st({rh:[-.2,.95,0],lh:[.2,.95,0]})},{t:.9,pel:[0,.6,.12],lF:[.13,0,.72],rF:[-.13,.06,-.48],rkp:[-.15,-1,.2]},{t:1.4,pel:[0,.6,.12]},{t:2.3,pel:[0,1,0],lF:[.13,0,0],rF:[-.13,0,0],rkp:[-.15,0,1]}],2.6),
+  phases:[ph('Bước tới',0,1,'Bước dài, hạ người đến khi gối sau gần chạm sàn.'),ph('Giữ',1,1.5,'Gối trước ngay trên cổ chân, thân thẳng.'),ph('Đẩy về',1.5,2.6,'Đẩy gót chân trước để về, đổi chân.')],
+  tips:'Giữ hông ngang, không đổ người về trước.'},
+ russian:{name:'Gập bụng xoay thân',noRacket:true,dur:2.4,cam:'cheo',camT:[0,.3,0],camR:2.8,mat:true,
+  keys:loop([{t:0,...st({pel:[0,.13,0],lean:-40,pl:-40,tw:40,lF:[.12,.18,.48],rF:[-.12,.18,.48],rh:[.22,.26,.1],lh:[.26,.24,.02],re:[-.5,-.5,.5],le:[.5,-.5,.5]})},{t:1.2,tw:-40,rh:[-.26,.24,.02],lh:[-.22,.26,.1]}],2.4),
+  phases:[ph('Xoay trái',0,1.2,'Ngồi ngả lưng khoảng 45°, chân nhấc khỏi sàn, xoay vai đưa hai tay chạm sàn bên trái.'),ph('Xoay phải',1.2,2.4,'Xoay sang phải; chuyển động từ thân, không chỉ vung tay.')],
+  tips:'Lưng thẳng, không gù. Khó quá thì đặt gót chân xuống sàn.'},
+ dead_bug:{name:'Dead bug',noRacket:true,dur:3.2,cam:'cheo',camT:[0,.3,-.2],camR:3,mat:true,
+  keys:loop([{t:0,...st({pel:[0,.12,0],lean:-90,pl:-90,rh:[-.19,.68,-.5],lh:[.19,.68,-.5],lF:[.1,.48,.45],rF:[-.1,.48,.45],rkp:[-.15,0,1],lkp:[.15,0,1]})},{t:.8,rh:[-.19,.16,-1.05],lF:[.1,.15,.92]},{t:1.6,rh:[-.19,.68,-.5],lF:[.1,.48,.45]},{t:2.4,lh:[.19,.16,-1.05],rF:[-.1,.15,.92]}],3.2),
+  phases:[ph('Tư thế đầu',0,.3,'Nằm ngửa, tay thẳng lên trần, hông và gối gập 90°.'),ph('Duỗi chéo',.3,1.6,'Hạ tay phải ra sau đầu đồng thời duỗi chân trái, lưng dưới luôn áp sàn.'),ph('Đổi bên',1.6,3.2,'Thu về rồi duỗi tay trái và chân phải.')],
+  tips:'Thở ra khi duỗi; chậm và có kiểm soát.'},
+ side_plank:{name:'Plank nghiêng',noRacket:true,dur:3,cam:'truoc',camT:[0,.35,0],camR:3.2,mat:true,matRot:90,
+  keys:loop([{t:0,...st({pel:[0,.33,0],tilt:70,pt:70,lean:0,rh:[-.55,.04,.32],lh:[-.4,1.15,0],re:[-.94,-.34,.1],lF:[.92,.1,-.06],rF:[.92,0,.06],lkp:[0,0,1],rkp:[0,0,1]})},{t:1.5,pel:[0,.36,0]}],3),
+  phases:[ph('Giữ',0,3,'Chống cẳng tay dưới vai, nâng hông để đầu, hông, chân thẳng hàng; tay trên giơ thẳng.')],
+  tips:'Không để hông võng xuống. Làm cả hai bên.'},
+ side_plank_rot:{name:'Plank nghiêng xoay thân',noRacket:true,dur:2.4,cam:'truoc',camT:[0,.35,0],camR:3.2,mat:true,matRot:90,
+  keys:loop([{t:0,...st({pel:[0,.33,0],tilt:70,pt:70,lean:0,rh:[-.55,.04,.32],lh:[-.4,1.15,0],re:[-.94,-.34,.1],lF:[.92,.1,-.06],rF:[.92,0,.06],lkp:[0,0,1],rkp:[0,0,1]})},{t:1.2,tw:-55,pel:[0,.38,0],lh:[-.62,.22,-.2]}],2.4),
+  phases:[ph('Mở',0,.6,'Tư thế plank nghiêng, tay trên giơ thẳng.'),ph('Xoay luồn tay',.6,1.8,'Xoay thân về phía sàn, luồn tay trên xuống dưới người, hông giữ cao.'),ph('Mở lại',1.8,2.4,'Xoay về, tay lên trần.')],
+  tips:'Chuyển động chậm; mắt nhìn theo tay.'},
+ squat_jump:{name:'Bật nhảy squat',noRacket:true,dur:1.8,cam:'ngang',
+  keys:loop([{t:0,...st({lF:[.18,0,0],rF:[-.18,0,0]})},{t:.6,pel:[0,.56,-.2],lean:35,rh:[-.25,.85,-.3],lh:[.25,.85,-.3]},{t:.85,pel:[0,1.25,0],lean:0,lF:[.18,.25,0],rF:[-.18,.25,0],rh:[-.2,2.0,.1],lh:[.2,2.0,.1]},{t:1.1,pel:[0,.72,-.1],lean:20,lF:[.18,0,0],rF:[-.18,0,0],rh:[-.2,1.0,.3],lh:[.2,1.0,.3]}],1.8),
+  phases:[ph('Hạ người',0,.65,'Squat xuống, tay vung ra sau.'),ph('Bật lên',.65,.9,'Đẩy mạnh cả hai chân, vung tay lên.'),ph('Tiếp đất',.9,1.8,'Tiếp đất nhẹ bằng mũi chân rồi gót, chùng gối giảm chấn.')],
+  tips:'Gối không khuỵu vào trong khi tiếp đất.'},
+ shoulder_tap:{name:'Plank chạm vai',noRacket:true,dur:2,cam:'cheo',camT:[0,.35,0],camR:3.2,mat:true,
+  keys:loop([{t:0,...st(PLANK_HI)},{t:.5,pel:[.04,.47,0],rh:[.17,.6,.42]},{t:1,pel:[0,.47,0],rh:[-.19,.03,.48]},{t:1.5,pel:[-.04,.47,0],lh:[-.17,.6,.42]}],2),
+  phases:[ph('Chạm vai trái',0,1,'Plank tay thẳng, chân rộng hơn hông. Tay phải chạm vai trái, hông không lắc.'),ph('Chạm vai phải',1,2,'Đặt tay xuống, tay trái chạm vai phải.')],
+  tips:'Siết bụng, giữ hông ngang như có cốc nước trên lưng.'},
+ skater:{name:'Bật nhảy trượt băng',noRacket:true,dur:1.8,cam:'truoc',
+  keys:loop([{t:0,...st({pel:[-.5,.7,0],lean:35,py:-10,ty:-20,rF:[-.55,0,0],lF:[-.28,.16,-.35],lkp:[.15,-.4,1],rh:[-.32,.95,-.2],lh:[-.3,1.0,.42]})},
+   {t:.45,pel:[0,.98,0],lean:15,py:0,ty:0,rF:[-.2,.15,0],lF:[.2,.15,0],rh:[-.3,1.1,.1],lh:[.3,1.1,.1]},
+   {t:.9,pel:[.5,.7,0],lean:35,py:10,ty:20,lF:[.55,0,0],rF:[.28,.16,-.35],rkp:[-.15,-.4,1],lkp:[.15,0,1],lh:[.32,.95,-.2],rh:[.3,1.0,.42]},
+   {t:1.35,pel:[0,.98,0],lean:15,py:0,ty:0,rF:[-.2,.15,0],lF:[.2,.15,0],rkp:[-.15,0,1],lkp:[.15,-.4,1],rh:[-.3,1.1,.1],lh:[.3,1.1,.1]}],1.8),
+  phases:[ph('Bật sang trái',0,.9,'Đẩy chân phải bật sang ngang, tiếp đất bằng chân trái, chân phải chéo ra sau.'),ph('Bật sang phải',.9,1.8,'Đẩy chân trái bật về bên phải. Tay đánh chéo giữ thăng bằng.')],
+  tips:'Tiếp đất êm, gối hơi chùng, giữ 1 nhịp rồi bật tiếp.'},
+ band_row:{name:'Kéo dây kháng lực',noRacket:true,dur:2.4,cam:'ngang',band:[0,1.08,1.3],
+  keys:loop([{t:0,...st({pel:[0,.95,0],lean:8,lF:[.18,0,0],rF:[-.18,0,0],rh:[-.15,1.12,.56],lh:[.15,1.12,.56]})},{t:1,rh:[-.24,1.1,.02],lh:[.24,1.1,.02],re:[-.4,-.6,-.7],le:[.4,-.6,-.7]},{t:1.4,rh:[-.24,1.1,.02]},{t:2.4,...st({pel:[0,.95,0],lean:8,lF:[.18,0,0],rF:[-.18,0,0],rh:[-.15,1.12,.56],lh:[.15,1.12,.56]})}],2.4),
+  phases:[ph('Kéo về',0,1.1,'Buộc dây ngang ngực. Kéo dây về sát sườn, khuỷu tay đi ra sau, ép hai bả vai.'),ph('Giữ',1.1,1.5,'Giữ 1 giây, vai không nhún lên.'),ph('Trả về',1.5,2.4,'Duỗi tay về chậm.')],
+  tips:'Giúp vai khoẻ và cân bằng sau nhiều cú vung.'},
+ band_ext:{name:'Xoay vai ra ngoài với dây',noRacket:true,dur:2.4,cam:'truoc',band:[.9,1.15,.25],
+  keys:loop([{t:0,...st({rh:[-.21,1.2,.27],re:[-.2,-1,-.2],lh:[.22,1.0,.02],le:[1,0,-.3]})},{t:1,rh:[-.45,1.2,.13]},{t:1.4,rh:[-.45,1.2,.13]}],2.4),
+  phases:[ph('Xoay ra',0,1.1,'Khuỷu tay kẹp sát sườn, gập 90°. Xoay cẳng tay ra ngoài, khuỷu không rời thân.'),ph('Giữ',1.1,1.5,'Giữ 1 giây.'),ph('Về',1.5,2.4,'Trả về chậm.')],
+  tips:'Dây nhẹ, nhiều lần: bài phòng chấn thương vai cho người chơi tennis.'},
+ burpee:{name:'Burpee',noRacket:true,dur:2.8,cam:'ngang',camT:[0,.6,0],
+  keys:[{t:0,...st({})},{t:.5,pel:[0,.45,-.15],lean:62,lF:[.15,0,0],rF:[-.15,0,0],rh:[-.2,.03,.42],lh:[.2,.03,.42]},{t:.85,pel:[0,.47,-.05],lean:76,pl:76,lF:[.12,0,-.88],rF:[-.12,0,-.88]},{t:1.2,pel:[0,.47,-.05]},
+   {t:1.55,pel:[0,.45,-.15],lean:62,pl:0,lF:[.15,0,0],rF:[-.15,0,0]},{t:1.95,pel:[0,1.22,0],lean:0,lF:[.15,.2,0],rF:[-.15,.2,0],rh:[-.18,2.05,.05],lh:[.18,2.05,.05]},{t:2.3,pel:[0,.85,0],lF:[.15,0,0],rF:[-.15,0,0],rh:[-.25,.9,.1],lh:[.25,.9,.1]},{t:2.8,...st({})}],
+  phases:[ph('Ngồi xuống',0,.6,'Squat, đặt hai tay xuống sàn trước chân.'),ph('Bật chân ra sau',.6,1.3,'Bật hai chân ra sau thành plank, thân thẳng.'),ph('Thu chân & bật lên',1.3,2.8,'Bật chân về, đứng dậy và nhảy lên, tay vươn cao.')],
+  tips:'Làm chậm lúc đầu; giữ bụng siết khi ở plank.'},
+ hollow:{name:'Giữ thân hình thuyền',noRacket:true,dur:3,cam:'ngang',camT:[0,.25,-.1],camR:3,mat:true,
+  keys:loop([{t:0,...st({pel:[0,.12,0],lean:-70,pl:-90,rh:[-.15,.42,-1.0],lh:[.15,.42,-1.0],lF:[.08,.2,.88],rF:[-.08,.2,.88]})},{t:1.5,lean:-72}],3),
+  phases:[ph('Giữ',0,3,'Nằm ngửa, ép lưng dưới xuống sàn, nâng vai và chân khỏi sàn, tay duỗi qua đầu.')],
+  tips:'Khó quá thì co gối hoặc đưa tay về phía hông.'},
+ jump_land:{name:'Bật lên, tiếp đất chân trái',noRacket:true,dur:2.2,cam:'ngang',
+  keys:([{t:0,...st({})},{t:.6,pel:[0,.7,-.08],lean:18,rh:[-.25,.9,-.25],lh:[.25,.9,-.25]},{t:.9,pel:[0,1.2,.1],lean:0,lF:[.13,.2,.1],rF:[-.13,.2,.05],rh:[-.25,1.95,.2],lh:[.25,1.9,.2]},
+   {t:1.2,pel:[0,.85,.25],lean:15,lF:[.13,0,.3],rF:[-.13,.28,-.05],rkp:[-.15,-1,0],rh:[-.6,1.2,.2],lh:[.5,1.2,.3]},{t:1.8,pel:[0,.86,.25]},{t:2.2,...st({})}]),
+  phases:[ph('Chùng gối',0,.65,'Hạ trọng tâm như ở tư thế cúp khi giao bóng.'),ph('Bật lên',.65,.95,'Đẩy hai chân bật lên và hơi về trước, tay vươn cao.'),ph('Tiếp đất',.95,2.2,'Tiếp đất bằng chân trái, chân phải đưa ra sau, giữ thăng bằng 2 giây.')],
+  tips:'Đúng như cách tiếp đất sau cú giao bóng.'},
+ bounce:{name:'Tâng bóng trên mặt vợt',dur:1.6,cam:'cheo',camT:[0,1.15,.3],camR:2.6,contactT:0,cUp:true,
+  keys:loop([{t:0,...st({pel:[0,.97,0],lean:6,rh:[-.18,1.03,.32],rk:[.25,.05,1],rf:[0,1,0],lh:[.25,.92,.1],re:[-.5,-.8,-.2]})},{t:.15,rh:[-.18,1.0,.32]},{t:.65,rh:[-.18,.98,.32]},{t:.8,rh:[-.18,1.03,.32]},{t:.95,rh:[-.18,1.0,.32]},{t:1.45,rh:[-.18,.98,.32]}],1.6),
+  ball:[{t0:0,t1:.8,a:'C',b:'C',h:.55},{t0:.8,t1:1.6,a:'C',b:'C',h:.3}],
+  phases:[ph('Tâng bóng',0,1.6,'Mặt vợt ngửa, ngang thắt lưng. Đẩy nhẹ bằng cổ tay và cẳng tay, bóng lên khoảng 30–50 cm; mắt theo bóng.')],
+  tips:'Giữ mặt vợt phẳng; bóng lệch thì di chuyển chân thay vì với tay.'},
+ bounce_alt:{name:'Tâng bóng hai mặt vợt',dur:1.6,cam:'cheo',camT:[0,1.15,.3],camR:2.6,contactT:0,cUp:true,
+  keys:loop([{t:0,...st({pel:[0,.97,0],lean:6,rh:[-.18,1.03,.32],rk:[.25,.05,1],rf:[0,1,0],lh:[.25,.92,.1],re:[-.5,-.8,-.2]})},{t:.4,rh:[-.18,1.0,.32],rf:[-1,0,0]},{t:.8,rh:[-.18,1.03,.32],rf:[0,-1,0]},{t:1.2,rh:[-.18,1.0,.32],rf:[-1,0,0]}],1.6),
+  ball:[{t0:0,t1:.8,a:'C',b:'C',h:.45},{t0:.8,t1:1.6,a:'C',b:'C',h:.45}],
+  phases:[ph('Mặt thuận',0,.8,'Tâng bằng mặt thuận tay, rồi xoay cẳng tay để lật vợt khi bóng đang lên.'),ph('Mặt trái',.8,1.6,'Tâng bằng mặt trái tay, lật lại. Cầm vợt kiểu Continental để lật dễ hơn.')],
+  tips:'Rèn cảm giác bóng và kiểm soát mặt vợt.'},
+ toss_catch:{name:'Tung và bắt bóng tay trái',dur:1.8,cam:'cheo',camT:[0,1.3,.3],camR:3,
+  keys:loop([{t:0,...st({rh:[-.25,.9,.05],rk:[.05,-1,.25],lh:[.15,1.0,.38],le:[.5,-.8,-.3]})},{t:.3,lh:[.13,1.28,.42]},{t:.5,lh:[.15,1.05,.38]},{t:1.2,lh:[.15,1.05,.4]},{t:1.35,lh:[.14,1.12,.4]}],1.8),
+  ball:[{t0:0,t1:.3,follow:'lh',off:[0,.05,.02]},{t0:.3,t1:1.35,a:{hand:'lh',t:.3},b:{hand:'lh',t:1.35},h:.85},{t0:1.35,t1:1.8,follow:'lh',off:[0,.05,.02]}],
+  phases:[ph('Tung',0,.4,'Tay thẳng, nhả bóng ở tầm mắt; bóng lên không xoáy.'),ph('Theo dõi',.4,1.2,'Mắt nhìn bóng suốt đường bay.'),ph('Bắt',1.2,1.8,'Bắt bóng phía trước, ngang mặt.')],
+  tips:'Nền tảng cho tung bóng khi giao và quan sát bóng.'},
+ ready_hold:{name:'Tư thế chờ',dur:3,cam:'cheo',
+  keys:loop([{t:0,...st({...READY})},{t:1.5,pel:[0,.84,0]}],3),
+  phases:[ph('Giữ tư thế',0,3,'Chân rộng hơn vai, gối chùng, trọng tâm trên mũi chân; vợt trước ngực, tay trái đỡ cổ vợt.')],
+  tips:'Từ tư thế này, bạn đi được về mọi hướng nhanh nhất.'},
+ breathe:{name:'Hít thở sâu',noRacket:true,dur:10,cam:'cheo',
+  keys:[{t:0,...st({})},{t:2,rh:[-.76,1.5,0],lh:[.76,1.5,0]},{t:4,pel:[0,1.02,0],rh:[-.18,2.1,.05],lh:[.18,2.1,.05]},{t:7,pel:[0,1,0],rh:[-.76,1.5,0],lh:[.76,1.5,0]},{t:10,...st({})}],
+  phases:[ph('Hít vào 4 nhịp',0,4,'Hít sâu bằng mũi, tay đưa từ hai bên lên trên đầu.'),ph('Thở ra 6 nhịp',4,10,'Thở ra chậm bằng miệng, tay hạ dần.')],
+  tips:'Giúp nhịp tim về bình thường sau buổi tập.'},
+ stretch_legs:{name:'Kéo giãn bắp chân, đùi trước, đùi sau',noRacket:true,dur:9,cam:'ngang',wall:.95,
+  keys:[{t:0,...st({})},{t:.6,pel:[0,.86,.05],lean:20,lF:[.13,0,.38],rF:[-.13,0,-.55],rh:[-.2,1.38,.86],lh:[.2,1.38,.86]},{t:2.6,pel:[0,.86,.05]},
+   {t:3.3,pel:[0,1,0],lean:2,ty:-20,tilt:10,lF:[.13,0,0],rF:[-.13,.78,-.3],rkp:[-.15,-1,.2],rh:[-.14,.88,-.33],lh:[.65,1.35,.2]},{t:5.6,pel:[0,1,0]},
+   {t:6.4,pel:[0,.92,-.18],lean:50,ty:0,tilt:0,rF:[-.13,0,.42],rkp:[-.15,0,1],lF:[.13,0,-.12],rh:[-.15,.62,.3],lh:[.05,.62,.3]},{t:8.4,pel:[0,.92,-.18]},{t:9,...st({})}],
+  phases:[ph('Bắp chân',0,3,'Tay chống tường, chân sau duỗi thẳng, gót ép xuống sàn. Giữ 30 giây mỗi chân.'),ph('Đùi trước',3,6,'Đứng một chân, kéo gót chân kia về sát mông, hai gối song song.'),ph('Đùi sau',6,9,'Duỗi thẳng chân trước, gót chạm sàn, gập người từ hông, lưng thẳng.')],
+  tips:'Giãn đến khi căng nhẹ, không đau. Không nhún.'},
+ stretch_hip:{name:'Kéo giãn hông và lưng dưới',noRacket:true,dur:6,cam:'ngang',
+  keys:[{t:0,...st({})},{t:.8,pel:[0,.45,.05],lean:-5,lF:[.13,0,.62],rF:[-.13,.04,-.62],rkp:[-.15,-1,0],rh:[.05,.6,.45],lh:[.18,.6,.5]},{t:3,pel:[0,.43,.07]},{t:3.8,lean:-10,tilt:-12,rh:[-.12,1.5,.0],lh:[.12,1.25,.15]},{t:5.3,pel:[0,.43,.07]},{t:6,...st({})}],
+  phases:[ph('Giãn cơ gập hông',0,3.2,'Quỳ một gối, chân kia bước trước. Đẩy hông về trước, thân thẳng.'),ph('Vươn và nghiêng',3.2,6,'Giơ tay cùng phía chân sau lên cao, nghiêng nhẹ thân sang bên kia.')],
+  tips:'Kê khăn dưới gối. Đổi bên.'},
+ stretch_shoulder:{name:'Kéo giãn vai, cẳng tay, cổ tay',noRacket:true,dur:6.4,cam:'cheo',camT:[0,1.3,.2],camR:2.6,
+  keys:[{t:0,...st({})},{t:.6,rh:[.42,1.38,.15],re:[-.2,-.3,1],lh:[.06,1.34,.34]},{t:2.8,rh:[.42,1.38,.15]},{t:3.5,rh:[-.08,1.42,.56],re:DEF_RE,lh:[-.07,1.5,.64]},{t:5.8,rh:[-.08,1.42,.56]},{t:6.4,...st({})}],
+  phases:[ph('Vai',0,3.2,'Đưa tay phải ngang qua ngực, tay trái ép nhẹ khuỷu tay phải vào người.'),ph('Cẳng tay & cổ tay',3.2,6.4,'Duỗi tay ra trước, lòng bàn tay hướng lên, tay kia kéo nhẹ các ngón về phía người. Lật ngược tay và lặp lại.')],
+  tips:'Giữ 30 giây mỗi bên; cổ tay và cẳng tay chịu tải lớn nhất khi chơi tennis.'},
+ stances:{name:'Bốn thế chân khi đánh',dur:7.2,cam:'tren',camT:[0,.6,.2],camR:3.4,stances:true}
+};
+
+/* stance clip built from the same foot data as the 2D diagrams */
+(function(){
+  const c=DRILLS.stances, S=.3, keys=[], phases=[];
+  const conv=([f,x,y,r])=>[-(x-5.6)*S,-(y-5)*S,-r];
+  const yaws=[-35,-50,-75,-90];
+  STANCES.forEach((sp,i)=>{
+    const L=conv(sp.feet[0]), R=conv(sp.feet[1]);
+    const mid=[(L[0]+R[0])/2,(L[1]+R[1])/2], py=yaws[i], ty=Math.max(-100,py-30);
+    const Ry=rotYXZ(ty*D2R,0,0), pel=[mid[0],.84,mid[1]];
+    const k={pel,py,ty,lean:10,tilt:0,tw:0,pl:0,pt:0,lF:[L[0],0,L[1]],rF:[R[0],0,R[1]],lYo:L[2]-py,rYo:R[2]-py,
+      rh:add(pel,mv(Ry,[-.3,.38,-.1])),lh:add(pel,mv(Ry,[.05,.36,.42])),lhAt:null,rk:mv(Ry,[-.15,.8,-.4]),rf:mv(Ry,[0,-.2,1]),re:DEF_RE,le:DEF_LE,rkp:[-.15,0,1],lkp:[.15,0,1]};
+    keys.push({...k,t:i*1.8},{...k,t:i*1.8+1.2});
+    phases.push({id:'st'+i,name:`${sp.name} (${sp.en})`,t0:i*1.8,t1:i*1.8+1.8,at:i*1.8+.9,cue:sp.note});
+  });
+  loop(keys,7.2); c.keys=keys; c.phases=phases;
+  c.ball=[{t0:0,t1:7.2,a:[-1.0,1.0,.55],b:[-1.0,1.0,.55],h:0}];
+  c.tips='Nhìn từ trên xuống: bóng ở bên phải, lưới phía trước. Thế chân thay đổi theo độ rộng và tốc độ của bóng.';
+})();
+DRILLS.sprint={...DRILLS.high_knees,name:'Chạy nước rút tại chỗ',dur:.4,keys:scaleKeys(DRILLS.high_knees.keys,.4/.6),phases:[ph('Tốc độ tối đa',0,.4,'Bước thật nhanh trên mũi chân, tay đánh mạnh. Hết sức trong 10 giây.')]};
+DRILLS.squat_hold={...DRILLS.squat,name:'Squat giữ 3 giây',dur:4.6,keys:loop([{t:0,...DRILLS.squat.keys[0]},{t:1.1,pel:[0,.52,-.22],lean:38,rh:[-.18,1.0,.5],lh:[.18,1.0,.5]},{t:3.5,pel:[0,.52,-.22]},{t:4.3,pel:[0,1,0],lean:2,rh:[-.18,1.45,.55],lh:[.18,1.45,.55]}],4.6),
+  phases:[ph('Hạ xuống',0,1.2,'Đẩy hông ra sau, gối cùng hướng mũi chân.'),ph('Giữ 3 giây',1.2,3.6,'Giữ ở điểm thấp nhất, lưng thẳng, gót bám sàn.'),ph('Đứng lên',3.6,4.6,'Đẩy gót để đứng lên.')]};
+DRILLS.mountain={name:'Leo núi (mountain climber)',noRacket:true,dur:.8,cam:'ngang',camT:[0,.35,0],camR:3.2,mat:true,
+  keys:loop([{t:0,...st({...PLANK_HI,rF:[-.12,.12,-.18],rkp:[-.15,0,1],lkp:[.15,0,1]})},{t:.4,rF:[-.12,0,-.85],lF:[.12,.12,-.18]}],.8),
+  phases:[ph('Kéo gối',0,.8,'Plank tay thẳng, kéo gối luân phiên về sát ngực thật nhanh, hông không nhô cao.')],tips:'Vai luôn nằm ngay trên cổ tay.'};
+
+/* ---------- footwork clips generated from step lists (metres, player faces +Z) ---------- */
+function stepClip(o){
+  const dt=o.dt||.36, hold0=o.hold0??.4, arms=o.arms||'ready';
+  const feet={L:{x:o.start.L[0],z:o.start.L[1],yaw:o.start.L[2]||0,y:0},R:{x:o.start.R[0],z:o.start.R[1],yaw:o.start.R[2]||0,y:0}};
+  const keys=[];
+  const pose=(t,lift,hopY,armPhase)=>{
+    const L=feet.L,R=feet.R, py=(L.yaw+R.yaw)/2*.75, ty=py*1.15;
+    const pel=[(L.x+R.x)/2,(arms==='run'?.95:.86)+(lift?.03:0)+hopY,(L.z+R.z)/2];
+    const Ry=rotYXZ(ty*D2R,0,0);
+    const k={t,pel,py,ty,lean:arms==='run'?8:12,tilt:0,tw:0,pl:0,pt:0,lF:[L.x,L.y,L.z],rF:[R.x,R.y,R.z],lYo:L.yaw-py,rYo:R.yaw-py,re:DEF_RE,le:DEF_LE,rkp:[-.15,0,1],lkp:[.15,0,1]};
+    if(arms==='run'){const s=armPhase?1:-1;k.rh=add(pel,mv(Ry,[-.24,.48+.06*s,.16*s]));k.lh=add(pel,mv(Ry,[.24,.48-.06*s,-.16*s]));k.lhAt=null;k.rk=[0,-1,.2];k.rf=[1,0,0];k.re=[-.3,-.8,-.5];k.le=[.3,-.8,-.5];}
+    else{k.rh=add(pel,mv(Ry,[-.08,.15,.32]));k.lhAt=.22;k.lh=[0,0,0];k.rk=mv(Ry,[.1,.45,1]);k.rf=mv(Ry,[1,0,0]);}
+    keys.push(k);
+  };
+  pose(0,false,0,0); pose(hold0,false,0,0);
+  let t=hold0;
+  o.groups.forEach((g,gi)=>{
+    const both=g.length>1;
+    const from={}; g.forEach(([f])=>from[f]={...feet[f]});
+    g.forEach(([f,x,z,yaw])=>{feet[f].x=(from[f].x+x)/2;feet[f].z=(from[f].z+z)/2;feet[f].y=both?.06:.09;feet[f].yaw=yaw??from[f].yaw;});
+    pose(t+dt/2,true,both?.08:0,gi%2);
+    g.forEach(([f,x,z,yaw])=>{feet[f].x=x;feet[f].z=z;feet[f].y=0;feet[f].yaw=yaw??from[f].yaw;});
+    t+=dt; pose(t,false,both?-.03:0,gi%2);
+  });
+  pose(t+(o.hold1??.7),false,0,0);
+  const dur=t+(o.hold1??.7)+.25;
+  const cues=o.cues||[]; const span=t-hold0;
+  const phases=cues.map((c,i)=>({id:'p'+i,name:c[0],t0:i===0?0:hold0+span*i/cues.length,t1:i===cues.length-1?dur:hold0+span*(i+1)/cues.length,at:hold0+span*(i+.5)/cues.length,cue:c[1]}));
+  return {name:o.name,keys,dur,phases,noRacket:arms==='run',cam:o.cam||'cheo',camT:o.camT,camR:o.camR,ladder:o.ladder,cones:o.cones,tips:o.tips,ball:o.ball,loopKeys:true};
+}
+const FWS=.4, fx=x=>-(x-5)*FWS, fz=y=>-(y-6)*FWS;
+const FWCLIPS={};
+Object.entries(FW).forEach(([id,p])=>{
+  const start={}, groups={};
+  p.feet.forEach(([f,x,y,r,n])=>{ if(n===0) start[f]=[fx(x),fz(y),-r]; else (groups[n]=groups[n]||[]).push([f,fx(x),fz(y),-r]); });
+  const ns=Object.keys(groups).map(Number).sort((a,b)=>a-b);
+  const ball=p.ball?[{t0:0,t1:99,a:[fx(p.ball[0]),1.0,fz(p.ball[1])],b:[fx(p.ball[0]),1.0,fz(p.ball[1])],h:0}]:null;
+  FWCLIPS[id]=stepClip({name:p.name+' · '+p.en,start,groups:ns.map(n=>groups[n]),dt:id==='adjust'?.24:.36,cues:p.steps.map((s,i)=>['Bước '+(i+1),s]),tips:'Lỗi hay gặp: '+p.mis,ball,camT:[fx(5),.7,fz(6)+.2],cam:id==='approach'?'cheo':'tren2',camR:4.4});
+});
+// lead/trail shuffle helper (metres)
+function shuffleGroups(state,dx,dz,steps){
+  const g=[]; const lead=(dx<-1e-6)?'R':(dx>1e-6?'L':'R'); const trail=lead==='R'?'L':'R';
+  for(let i=0;i<steps;i++){
+    state[lead]=[state[lead][0]+dx/steps,state[lead][1]+dz/steps]; g.push([[lead,state[lead][0],state[lead][1],0]]);
+    state[trail]=[state[trail][0]+dx/steps,state[trail][1]+dz/steps]; g.push([[trail,state[trail][0],state[trail][1],0]]);
+  }
+  return g;
+}
+(function(){
+  let s={L:[.16,0],R:[-.16,0]};
+  const g=[...shuffleGroups(s,-1.4,0,3),...shuffleGroups(s,2.8,0,6),...shuffleGroups(s,-1.4,0,3)];
+  FWCLIPS.cones=stepClip({name:'Trượt ngang chạm mốc',start:{L:[.16,0],R:[-.16,0]},groups:g,dt:.24,cones:[[-1.85,.35],[1.85,.35]],cam:'truoc',camT:[0,.7,0],camR:5,
+    cues:[['Sang phải','Trượt ngang 3 bước về mốc phải, chân phải dẫn.'],['Sang trái','Đổi hướng ngay, trượt 6 bước về mốc trái.'],['Về giữa','Trượt về giữa và split-step.']],tips:'Hạ thấp trọng tâm khi đổi hướng; chân không chạm nhau.'});
+  s={L:[.16,0],R:[-.16,0]};
+  const dirs=[['Trái',2,0],['Chéo trái',1.41,1.41],['Trước',0,2],['Chéo phải',-1.41,1.41],['Phải',-2,0]];
+  let sg=[]; dirs.forEach(([n,dx,dz])=>{sg=sg.concat(shuffleGroups(s,dx,dz,3),shuffleGroups(s,-dx,-dz,3));});
+  FWCLIPS.spider=stepClip({name:'Bài con nhện',start:{L:[.16,0],R:[-.16,0]},groups:sg,dt:.2,cones:dirs.map(d=>[d[1]*1.08,d[2]*1.08+.1]).concat([[0,-.35]]),cam:'tren2',camT:[0,.5,.8],camR:5.6,
+    cues:dirs.map(d=>[d[0],`Di chuyển nhanh tới mốc ${d[0].toLowerCase()}, chạm tay rồi lùi về tâm.`]),tips:'Bấm giờ cả 5 mốc; luôn quay mặt về phía lưới.'});
+  const Z0=-1.0, Q=.45, zc=i=>Z0+Q/2+Q*i;
+  const two=[],one=[],io=[],ick=[];
+  for(let i=0;i<6;i++){two.push([['R',-.1,zc(i)]],[['L',.1,zc(i)]]);one.push([[i%2?'L':'R',i%2?.06:-.06,zc(i)]]);
+    if(i%2===0) io.push([['R',-.1,zc(i)]],[['L',.1,zc(i)]]); else io.push([['R',-.42,zc(i)]],[['L',.42,zc(i)]]);
+    if(i%2===0) ick.push([['L',.1,zc(i)]],[['R',-.1,zc(i)]],[['L',.45,zc(i+1)]]); else ick.push([['R',-.1,zc(i)]],[['L',.1,zc(i)]],[['R',-.45,zc(i+1)]]);}
+  const lad={ladder:true,cam:'cheo',camT:[0,.5,.4],camR:4.6,arms:'run',start:{L:[.13,Z0-.35],R:[-.13,Z0-.35]}};
+  FWCLIPS.ladder_two=stepClip({...lad,name:'Thang dây: hai chân mỗi ô',groups:two,dt:.2,cues:[['Nhịp chân','Chân phải rồi chân trái cùng vào một ô, chạm đất bằng mũi chân, tay đánh nhịp.']],tips:'Ưu tiên chính xác, sau đó mới tăng tốc.'});
+  FWCLIPS.ladder_one=stepClip({...lad,name:'Thang dây: một chân mỗi ô',groups:one,dt:.22,cues:[['Chạy nhanh','Mỗi ô một bước, gối nâng, bước ngắn và nhanh.']],tips:'Mắt nhìn trước, không nhìn chằm chằm xuống chân.'});
+  FWCLIPS.ladder_inout=stepClip({...lad,name:'Thang dây: vào – vào – ra – ra',groups:io,dt:.22,cues:[['Vào – vào','Hai chân lần lượt vào ô.'],['Ra – ra','Ô tiếp theo: hai chân lần lượt bước ra hai bên ngoài thang.']],tips:'Giữ nhịp 1-2-3-4 đều.'});
+  FWCLIPS.ickey=stepClip({...lad,name:'Thang dây: ickey shuffle',groups:ick,dt:.2,start:{L:[.4,Z0-.35],R:[.15,Z0-.35]},cues:[['Vào – vào – ra','Trái vào, phải vào, trái ra ngoài ô tiếp theo; rồi đổi bên: phải vào, trái vào, phải ra.']],tips:'Nhịp nhanh, nhẹ, giống điệu nhảy.'});
+  FWCLIPS.split_step=stepClip({name:'Split-step và bước đầu tiên',start:{L:[.16,0],R:[-.16,0]},dt:.32,
+    groups:[[['L',.24,0],['R',-.24,0]],[['R',-.78,.12,-40]],[['R',-.24,0,0]],[['L',.24,0],['R',-.24,0]],[['L',.78,.12,40]],[['L',.24,0,0]]],
+    cues:[['Bật chờ','Bật nhẹ, tiếp đất hai mũi chân rộng hơn vai.'],['Bước phải','Xoay mũi chân phải và bước dài về hướng bóng.'],['Bật chờ','Về giữa, bật chờ lần nữa.'],['Bước trái','Bước chân trái về bên trái.']],cam:'truoc',camT:[0,.7,0],camR:4.2,tips:'Bước đầu tiên luôn là xoay mũi chân phía bóng.'});
+})();
+
+/* ---------- grip clip ---------- */
+const GRIPS=[
+ {name:'Đánh số mặt cán',b:null,cue:'Cầm vợt sao cho mặt vợt vuông góc mặt đất. Nhìn từ đáy cán: mặt trên cùng là số 1, đếm theo chiều kim đồng hồ đến số 8 (người thuận tay trái đếm ngược chiều).'},
+ {name:'Continental (cầm búa)',b:2,cue:'Khớp ngón trỏ và đệm gót bàn tay cùng nằm trên mặt số 2. Dùng cho giao bóng, vô-lê, đập bóng, trái tay cắt.'},
+ {name:'Eastern thuận tay',b:3,cue:'Mặt số 3, như bắt tay với cán vợt: lòng bàn tay cùng hướng mặt vợt. Dễ đánh bóng phẳng, hợp người mới học thuận tay.'},
+ {name:'Semi-Western',b:4,cue:'Mặt số 4. Phổ biến nhất ở thuận tay hiện đại: tạo topspin tốt, đánh được bóng cao ngang vai.'},
+ {name:'Western',b:5,cue:'Mặt số 5. Topspin rất mạnh, xử lý tốt bóng nảy cao nhưng khó với bóng thấp.'},
+ {name:'Eastern trái tay',b:1,cue:'Mặt số 1, dùng cho trái tay một tay. Ngón cái đặt chéo sau cán để đỡ lực.'},
+ {name:'Trái tay hai tay',b:2,b2:7,cue:'Tay phải cầm Continental (mặt 2) ở đáy cán. Tay trái cầm phía trên, như Eastern thuận tay của tay trái (mặt 7).'}
+];
+DRILLS.grip={name:'Các cách cầm vợt',grip:true,dur:GRIPS.length*2.6,cam:'grip',
+  phases:GRIPS.map((g,i)=>({id:'g'+i,name:g.name,t0:i*2.6,t1:(i+1)*2.6,at:i*2.6+1.6,cue:g.cue,b:g.b,b2:g.b2})),
+  tips:'Chấm cam: khớp ngón trỏ. Chấm xanh: đệm gót bàn tay. Kéo để xoay cán vợt.'};
+
+Object.values(DRILLS).forEach(c=>{if(c.keys&&!c.prepped){prepStroke(c);c.prepped=true;}});
+Object.values(FWCLIPS).forEach(c=>{prepStroke(c);});
+
+function getClip(id){
+  if(!id) return null; id=id.split('@')[0];
+  if(id.startsWith('st:')){const k=id.slice(3);const s=STROKES[k];return s?{...s,home:true,noBall:true,cam:s.side>0?'cheo':'cheoL',name:s.name+' · '+s.en+' (vung không bóng)',tips:'Đường vàng là đường vung vợt; vòng vàng là điểm tiếp xúc lý tưởng.'}:null;}
+  if(id.startsWith('fw:')){const k=id.slice(3);return k==='stance'?DRILLS.stances:FWCLIPS[k]||null;}
+  return DRILLS[id]||FWCLIPS[id]||null;
+}
+
+/* ---------- drill stage (second 3D view, home setting) ---------- */
+function createDrillStage(canvas,view,hooks){
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(40,1.3,.05,80);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x5a4a3a,.85));
+  const sun=new THREE.DirectionalLight(0xffffff,.9); sun.position.set(-2.5,6,3.5); sun.castShadow=true; sun.shadow.mapSize.set(1024,1024);
+  Object.assign(sun.shadow.camera,{left:-3.5,right:3.5,top:3.5,bottom:-3.5,near:.5,far:20}); sun.shadow.camera.updateProjectionMatrix(); sun.shadow.bias=-.0008; scene.add(sun);
+  const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.9,...o});
+  const room=new THREE.Group(); scene.add(room);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),mat(0xa47a52)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; room.add(floor);
+  const seams=[];for(let x=-8;x<=8;x+=.2)seams.push(x,.001,-8,x,.001,8);
+  const sgeo=new THREE.BufferGeometry();sgeo.setAttribute('position',new THREE.Float32BufferAttribute(seams,3));
+  room.add(new THREE.LineSegments(sgeo,new THREE.LineBasicMaterial({color:0x7d5a3a,transparent:true,opacity:.35})));
+  const rug=new THREE.Mesh(new THREE.PlaneGeometry(3,4),mat(0x2f5a74)); rug.rotation.x=-Math.PI/2; rug.position.y=.003; rug.receiveShadow=true; room.add(rug);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(6,3,.1),mat(0xe4dfd4)); wall.receiveShadow=true; room.add(wall);
+  const ymat=new THREE.Mesh(new THREE.BoxGeometry(.62,.012,1.9),mat(0x5b8c6e)); ymat.receiveShadow=true; room.add(ymat);
+  const ladder=new THREE.Group(); room.add(ladder);
+  {const tm=mat(0xf2d14b); const tb=(w,d,x,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,.004,d),tm);m.position.set(x,.006,z);ladder.add(m);};
+   const Z0=-1.0,Q=.45,N=6; tb(.03,Q*N,-.25,Z0+Q*N/2); tb(.03,Q*N,.25,Z0+Q*N/2); for(let i=0;i<=N;i++) tb(.53,.03,0,Z0+Q*i);}
+  const cones=[]; for(let i=0;i<7;i++){const c=new THREE.Mesh(new THREE.ConeGeometry(.07,.17,18),mat(0xee7a2c,{roughness:.6}));c.castShadow=true;c.position.y=.085;room.add(c);cones.push(c);}
+  const bandPost=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,1.4,10),mat(0x8a96a3)); room.add(bandPost);
+  const bandGeo=new THREE.BufferGeometry(); bandGeo.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(12),3));
+  const band=new THREE.LineSegments(bandGeo,new THREE.LineBasicMaterial({color:0xd8443a})); band.frustumCulled=false; scene.add(band);
+  const ropeGeo=new THREE.BufferGeometry(); ropeGeo.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(33*3),3));
+  const rope=new THREE.Line(ropeGeo,new THREE.LineBasicMaterial({color:0x222222})); rope.frustumCulled=false; scene.add(rope);
+  const actorG=new THREE.Group(); scene.add(actorG); const actor=makeActor(actorG);
+  const ball=new THREE.Mesh(new THREE.SphereGeometry(.034,20,14),new THREE.MeshStandardMaterial({color:0xd6ee3a,roughness:.55,emissive:0x2a3300})); ball.castShadow=true; scene.add(ball);
+  const pathGeo=new THREE.BufferGeometry(), pathLine=new THREE.Line(pathGeo,new THREE.LineBasicMaterial({color:0xf4c534,transparent:true,opacity:.75})); pathLine.frustumCulled=false; scene.add(pathLine);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.055,.075,36),new THREE.MeshBasicMaterial({color:0xf4c534,side:THREE.DoubleSide,depthWrite:false})); scene.add(ring);
+
+  /* grip close-up */
+  const grip=new THREE.Group(); scene.add(grip);
+  const APO=.6, GL=3.6, side=2*APO*Math.tan(Math.PI/8), bevels=[], baseCol=0xeeeeee;
+  for(let k=1;k<=8;k++){const a=(k-1)*Math.PI/4;const m=new THREE.Mesh(new THREE.BoxGeometry(side*1.02,.04,GL),new THREE.MeshStandardMaterial({color:baseCol,roughness:.7}));
+    m.position.set(Math.sin(a)*APO,Math.cos(a)*APO,0); m.rotation.z=-a; grip.add(m); bevels.push(m);
+    const cv=document.createElement('canvas');cv.width=cv.height=64;const g=cv.getContext('2d');g.fillStyle='#102030';g.beginPath();g.arc(32,32,28,0,7);g.fill();g.fillStyle='#fff';g.font='bold 34px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(String(k),32,34);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),depthTest:false}));sp.scale.set(.32,.32,1);sp.position.set(Math.sin(a)*(APO+.32),Math.cos(a)*(APO+.32),GL/2+.08);grip.add(sp);}
+  const core=new THREE.Mesh(new THREE.CylinderGeometry(APO*.98,APO*.98,GL*.99,8),new THREE.MeshStandardMaterial({color:0xd8d8d8})); core.rotation.x=Math.PI/2; core.rotation.y=Math.PI/8; grip.add(core);
+  const cap=new THREE.Mesh(new THREE.CylinderGeometry(APO*1.12,APO*1.12,.12,8),new THREE.MeshStandardMaterial({color:0x1e252d})); cap.rotation.x=Math.PI/2; cap.rotation.y=Math.PI/8; cap.position.z=GL/2+.06; grip.add(cap);
+  const gFrame=new THREE.MeshStandardMaterial({color:0x1e252d,roughness:.4});
+  [-1,1].forEach(sg=>{const t=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,2.3,10),gFrame);t.rotation.x=Math.PI/2;t.rotation.order='ZXY';t.position.set(0,sg*.55,-GL/2-1.0);t.rotation.x=Math.PI/2+sg*.42;grip.add(t);});
+  const hp=[];for(let i=0;i<64;i++){const a=i/64*Math.PI*2;hp.push(new THREE.Vector3(0,1.28*Math.sin(a),-GL/2-1.42-1.65+1.65*Math.cos(a)));}
+  grip.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(hp,true),80,.1,8,true),gFrame));
+  const mk=(c)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(.13,18,14),new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.25}));grip.add(m);return m;};
+  const knuckle=mk(0xe8742c), heel=mk(0x2b7bd6), knuckle2=mk(0xe8742c), heel2=mk(0x2b7bd6);
+  const palmMat=new THREE.MeshStandardMaterial({color:0xc58a64,transparent:true,opacity:.45,depthWrite:false});
+  const palm=new THREE.Mesh(new THREE.BoxGeometry(side*1.6,.14,1.35),palmMat), palm2=new THREE.Mesh(new THREE.BoxGeometry(side*1.6,.14,1.35),palmMat); grip.add(palm,palm2);
+  grip.visible=false;
+
+  /* state */
+  let clip=null, t=0, playing=true, speed=.5, phaseIdx=-1, dirty=true, visible=true;
+  const cam={th:-40,ph:14,r:3.6,tTh:-40,tPh:14,tR:3.6}; let T=[0,.9,0];
+  const PRE={ngang:[-90,10],cheo:[-42,14],cheoL:[42,14],truoc:[0,8],sau:[180,14],tren:[180,72],tren2:[200,48],grip:[32,22]};
+  function setCam(name,instant){
+    const p=PRE[name]||PRE.cheo; cam.tTh=p[0]; cam.tPh=p[1]; cam.tR=clip?.grip?7.6:(clip?.camR||3.6);
+    let d=((cam.tTh-cam.th)%360+540)%360-180; cam.th=cam.tTh-d;
+    if(instant){cam.th=cam.tTh;cam.ph=cam.tPh;cam.r=cam.tR;} dirty=true; hooks.onCam&&hooks.onCam(name);
+  }
+  function setClip(c,opt={}){
+    clip=c; const home=!c.grip;
+    room.visible=actorG.visible=home; grip.visible=!!c.grip;
+    wall.visible=c.wall!=null; if(wall.visible) wall.position.set(0,1.5,c.wall+(c.wall<0?-.05:.05));
+    ymat.visible=!!c.mat; ymat.position.set(0,.006,c.matRot?0:-.2); ymat.rotation.y=(c.matRot||0)*D2R;
+    ladder.visible=!!c.ladder;
+    cones.forEach((m,i)=>{const p=c.cones&&c.cones[i];m.visible=!!p;if(p)m.position.set(p[0],.085,p[1]);});
+    bandPost.visible=band.visible=!!c.band; if(c.band) bandPost.position.set(c.band[0],.7,c.band[2]);
+    rope.visible=!!c.rope;
+    pathLine.visible=!!(c.home&&c.path); if(pathLine.visible) pathGeo.setFromPoints(c.path.map(p=>new THREE.Vector3(...p)));
+    ring.visible=!!(c.home&&c.contactPos); if(ring.visible) ring.position.set(...c.contactPos);
+    T=c.grip?[0,0,-.9]:(c.camT||(c.home?[0,1.05,.3]:[0,.9,0]));
+    const p=opt.phase!=null?c.phases.find(x=>x.id===opt.phase):null;
+    t=p?p.at:0; if(opt.phase!=null) setPlaying(false); else setPlaying(!reduceMotion); if(reduceMotion&&!p) t=c.phases[0]?.at||0;
+    phaseIdx=-1; setCam(c.cam||'cheo',true); dirty=true;
+  }
+  function setPlaying(v){playing=v;hooks.onPlay&&hooks.onPlay(v);}
+  function jump(i){if(!clip)return;const n=clip.phases.length;i=(i+n)%n;t=clip.phases[i].at;setPlaying(false);dirty=true;}
+  const ropeTmp=new THREE.Vector3();
+  function renderPose(){
+    if(clip.grip){
+      const i=Math.max(0,clip.phases.findIndex(p=>t>=p.t0&&t<p.t1)); const pc=clip.phases[i], pp=clip.phases[Math.max(0,i-1)];
+      const u=Math.min(1,(t-pc.t0)/.7), e=u*u*(3-2*u);
+      const ang=b=>b==null?null:(b-1)*Math.PI/4;
+      let a1=ang(pc.b), a0=ang(pp.b??pc.b); if(a1!=null&&a0!=null){let d=a1-a0;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;a1=a0+d*e;}
+      bevels.forEach((m,k)=>m.material.color.setHex(pc.b===k+1?0xf4c534:(pc.b2===k+1?0xf0a868:(pc.b==null?0xffffff:baseCol))));
+      const on=a1!=null; [knuckle,heel,palm].forEach(m=>m.visible=on);
+      if(on){const dir=[Math.sin(a1),Math.cos(a1)];
+        const z1=pc.b2?.5:-.9, z2=pc.b2?1.55:1.25;
+        knuckle.position.set(dir[0]*(APO+.12),dir[1]*(APO+.12),z1); heel.position.set(dir[0]*(APO+.12),dir[1]*(APO+.12),z2);
+        palm.position.set(dir[0]*(APO+.1),dir[1]*(APO+.1),(z1+z2)/2); palm.rotation.set(0,0,-a1);}
+      const on2=pc.b2!=null; [knuckle2,heel2,palm2].forEach(m=>m.visible=on2);
+      if(on2){const a2=ang(pc.b2),d2=[Math.sin(a2),Math.cos(a2)];knuckle2.position.set(d2[0]*(APO+.12),d2[1]*(APO+.12),-1.6);heel2.position.set(d2[0]*(APO+.12),d2[1]*(APO+.12),-.4);palm2.position.set(d2[0]*(APO+.1),d2[1]*(APO+.1),-1.0);palm2.rotation.set(0,0,-a2);}
+      return;
+    }
+    const r=computeRig(sampleKeys(clip.keys,t));
+    actor.update(r,{racket:!clip.noRacket,shoeSplay:.08});
+    const b=clip.noBall?null:ballAt(clip,t,r); ball.visible=!!b; if(b) ball.position.set(...b);
+    if(clip.rope){
+      const th=2*Math.PI*(t/clip.dur), mid=mul(add(r.lHand,r.rHand),.5), C=add(mid,[0,1.95*Math.cos(th),1.95*Math.sin(th)*.6]);
+      const arr=ropeGeo.attributes.position.array;
+      for(let i=0;i<=32;i++){const s=i/32,a=(1-s)*(1-s),bb=2*(1-s)*s,c=s*s;arr[i*3]=a*r.lHand[0]+bb*C[0]+c*r.rHand[0];arr[i*3+1]=Math.max(.01,a*r.lHand[1]+bb*C[1]+c*r.rHand[1]);arr[i*3+2]=a*r.lHand[2]+bb*C[2]+c*r.rHand[2];}
+      ropeGeo.attributes.position.needsUpdate=true;
+    }
+    if(clip.band){const arr=bandGeo.attributes.position.array, A=[clip.band[0],clip.band[1],clip.band[2]];
+      arr.set(A,0);arr.set(r.rHand,3);arr.set(clip.band[0]===0?A:A,6);arr.set(clip.band[0]===0?r.lHand:r.rHand,9);bandGeo.attributes.position.needsUpdate=true;}
+  }
+  function place(){
+    const ph=cam.ph*D2R, th=cam.th*D2R;
+    camera.position.set(T[0]+cam.r*Math.cos(ph)*Math.sin(th),T[1]+cam.r*Math.sin(ph),T[2]+cam.r*Math.cos(ph)*Math.cos(th));
+    camera.lookAt(T[0],T[1],T[2]); ring.quaternion.copy(camera.quaternion);
+  }
+  // orbit
+  const pts=new Map(); let pinch0=0;
+  view.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});view.setPointerCapture(e.pointerId);if(pts.size===2){const [a,b]=[...pts.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);}});
+  view.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+    if(pts.size===2){p.x=e.clientX;p.y=e.clientY;const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0){cam.tR=cam.r=Math.min(14,Math.max(1.5,cam.r*pinch0/d));}pinch0=d;dirty=true;return;}
+    const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+    cam.th-=dx*.45; cam.ph=Math.min(85,Math.max(-4,cam.ph+dy*.3)); cam.tTh=cam.th; cam.tPh=cam.ph; dirty=true; hooks.onCam&&hooks.onCam(null);});
+  const up=e=>{pts.delete(e.pointerId);pinch0=0;}; view.addEventListener('pointerup',up); view.addEventListener('pointercancel',up);
+  function resize(){const w=view.clientWidth,h=view.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();dirty=true;}
+  new ResizeObserver(resize).observe(view); resize();
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:0}).observe(view);
+  function applyTheme(){const c=new THREE.Color(cssColor('--sky'));scene.background=c;dirty=true;}
+  applyTheme(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+  new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  let last=performance.now();
+  function frame(now){
+    const dt=Math.min((now-last)/1000,.05); last=now;
+    if(clip){
+      if(playing&&visible&&!document.hidden){t+=dt*speed*(clip.grip?2:1);if(t>=clip.dur)t-=clip.dur;dirty=true;}
+      const k=1-Math.pow(.0015,dt);
+      if(Math.abs(cam.th-cam.tTh)>.05||Math.abs(cam.ph-cam.tPh)>.05||Math.abs(cam.r-cam.tR)>.005){cam.th+=(cam.tTh-cam.th)*k;cam.ph+=(cam.tPh-cam.ph)*k;cam.r+=(cam.tR-cam.r)*k;dirty=true;}
+      if(dirty&&visible){renderPose();place();renderer.render(scene,camera);dirty=false;
+        let i=clip.phases.findIndex(p=>t>=p.t0&&t<p.t1); if(i<0) i=clip.phases.length-1;
+        if(i!==phaseIdx){phaseIdx=i;hooks.onPhase&&hooks.onPhase(i);} hooks.onTime&&hooks.onTime(t/clip.dur);}
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  return {setClip,setCam,jump,setPlaying,toggle:()=>{setPlaying(!playing);dirty=true;},isPlaying:()=>playing,setSpeed:v=>{speed=v;},seek:f=>{if(clip){t=f*clip.dur;setPlaying(false);dirty=true;}},phase:()=>phaseIdx};
+}
+
+/* ---------- which animation goes with each curriculum item ---------- */
+const ANIM_TEXT={
+ 'Chạy bước nhỏ tại chỗ':'jog','Xoay khớp cổ, vai, cổ tay, hông, gối, cổ chân':'joints','Xoay khớp toàn thân':'joints','Bật nhảy dang tay chân (jumping jack)':'jack',
+ 'Lunge bước tới kèm xoay thân':'lunge_twist','Đá lăng chân trước – sau, sang ngang':'leg_swing','Nhảy dây (hoặc nhảy dây giả)':'rope','Inchworm: bò tay ra rồi bước chân về':'inchworm','Nâng cao đùi tại chỗ':'high_knees',
+ 'Kéo giãn bắp chân, đùi trước, đùi sau':'stretch_legs','Kéo giãn hông và lưng dưới':'stretch_hip','Kéo giãn vai, cẳng tay, cổ tay':'stretch_shoulder','Hít thở sâu: 4 nhịp vào, 6 nhịp ra':'breathe',
+ 'Giữ tư thế chờ: chân rộng hơn vai, gối chùng, trọng tâm trên mũi chân':'ready_hold','Split-step rồi bước một bước sang phải, sang trái':'fw:split_step',
+ 'Đổi cách cầm Continental → Eastern → Semi-Western theo hiệu lệnh, không nhìn tay':'grip',
+ 'Tâng bóng nhẹ trên mặt vợt (khó thì để bóng lăn trên mặt vợt)':'bounce','Tâng bóng trên mặt vợt':'bounce','Tâng bóng xen kẽ cao – thấp':'bounce','Tâng bóng bằng mặt trái của vợt':'bounce_alt','Tâng bóng xen kẽ hai mặt vợt':'bounce_alt',
+ 'Squat':'squat','Plank':'plank','Nhón gót':'calf_raise','Nhón gót một chân':'calf_single','Ngồi dựa tường':'wall_sit','Lunge sang ngang':'lateral_lunge','Lunge bước tới':'lunge','Lunge bước tiến':'lunge',
+ 'Gập bụng xoay thân (Russian twist)':'russian','Dead bug':'dead_bug','Plank nghiêng':'side_plank','Bật nhảy squat':'squat_jump','Bật nhảy cao':'squat_jump','Plank chạm vai':'shoulder_tap',
+ 'Bật nhảy trượt băng (skater jump)':'skater','Kéo dây kháng lực về ngực (row)':'band_row','Kéo dây kháng lực':'band_row','Xoay vai ra ngoài với dây kháng lực':'band_ext','Burpee':'burpee',
+ 'Giữ thân hình thuyền (hollow hold)':'hollow','Plank nghiêng xoay thân':'side_plank_rot','Leo núi (mountain climber)':'mountain','Chạy nước rút tại chỗ':'sprint','Squat giữ 3 giây ở điểm thấp nhất':'squat_hold',
+ 'Plank thường, plank nghiêng, plank chạm vai':'shoulder_tap','Vòng bụng: dead bug, plank nghiêng, hollow hold':'dead_bug',
+ 'Trượt ngang chạm hai mốc cách 3 m':'fw:cones','Đo: số lần trượt ngang chạm hai mốc cách 3 m trong 30 giây':'fw:cones','Đo: nhảy dây 1 phút, đếm số lần':'rope','Nhảy dây 1 phút, đếm số lần':'rope',
+ 'Tabata: 20 giây nhảy dây hoặc bật nhảy, 10 giây nghỉ':'rope',
+ 'Thang dây: hai chân vào mỗi ô':'fw:ladder_two','Thang dây tiến thẳng: hai chân mỗi ô':'fw:ladder_two','Thang dây: một chân mỗi ô, chạy nhanh':'fw:ladder_one','Thang dây: vào – vào – ra – ra':'fw:ladder_inout','Thang dây: ickey shuffle':'fw:ickey',
+ 'Bài “con nhện”: từ tâm chạm 5 mốc (trái, chéo trái, trước, chéo phải, phải) cách 2 m, bấm giờ':'fw:spider','Bài con nhện như buổi 10, bấm giờ':'fw:spider','Bài con nhện và trượt ngang 30 giây, so với buổi 5':'fw:spider',
+ 'Tung và bắt bóng bằng tay trái, mắt nhìn bóng đến khi chạm tay':'toss_catch','Động tác ném bóng qua vai, không cầm vợt':'throw',
+ 'Tiếp đất bằng chân trái sau động tác giao bóng, giữ thăng bằng 2 giây':'jump_land','Bật lên từ tư thế chùng gối, tiếp đất bằng chân trái':'jump_land',
+ 'Phản xạ theo hiệu lệnh: người khác chỉ hướng (hoặc ứng dụng hô ngẫu nhiên), split-step rồi di chuyển 2 bước':'fw:split_step',
+ 'Xoay lùi → bắt chéo lùi 2 bước → dừng, vung thuận tay':'fw:dropstep','Split-step theo tiếng bóng nảy: thả bóng xuống sàn, bật đúng lúc bóng chạm sàn':'fw:split','Trượt ngang và bắt chéo tốc độ cao':'fw:cones',
+ 'Quay video thuận tay (vung không bóng hoặc đánh tường) từ bên hông, 5–8 giây':'st:forehand','Quay video thuận tay và trái tay, chấm bằng AI':'st:forehand','Quay video giao bóng và vô-lê, chấm bằng AI':'st:serve',
+ 'Quay lại thuận tay, so sánh với buổi 5 và 10':'st:forehand','Quay 4 cú: thuận tay, trái tay, giao bóng, vô-lê; chấm bằng AI':'st:forehand','Quay video hiệp cuối, cho AI chấm để xem kỹ thuật khi mệt':'st:forehand'
+};
+DRILLS.throw={...STROKES.serve,name:'Động tác ném qua vai',noRacket:true,noBall:true,home:false,cam:'cheo',
+  phases:[ph('Chuẩn bị',0,.9,'Đứng nghiêng như khi giao bóng, tay ném đưa xuống và ra sau.'),ph('Nạp lực',.9,1.38,'Khuỷu tay lên ngang vai, tay trái chỉ về trước, gối chùng.'),ph('Ném',1.38,1.7,'Đẩy chân, xoay hông rồi vai, khuỷu tay dẫn, cổ tay vẩy cuối cùng.'),ph('Kết thúc',1.7,2.8,'Tay ném đi qua người về bên trái, bước chân sau lên.')],
+  tips:'Động tác ném xa chính là nền tảng của giao bóng.'};
+function animFor(item){const [t,,l]=item; if(ANIM_TEXT[t]) return ANIM_TEXT[t]; if(l&&l.st) return 'st:'+l.st+(l.ph?'@'+l.ph:''); if(l&&l.fw) return 'fw:'+l.fw; return null;}
+window.__santap.DRILLS=DRILLS; window.__santap.FWCLIPS=FWCLIPS; window.__santap.getClip=getClip; window.__santap.animFor=animFor;
+
+/* ================= CURRICULUM ================= */
+const WARM={
+ A:[['Chạy bước nhỏ tại chỗ','1 phút'],['Xoay khớp cổ, vai, cổ tay, hông, gối, cổ chân','2 phút'],['Bật nhảy dang tay chân (jumping jack)','2 × 20'],['Lunge bước tới kèm xoay thân','8 lần/bên'],['Đá lăng chân trước – sau, sang ngang','10 lần/chân']],
+ B:[['Nhảy dây (hoặc nhảy dây giả)','2 × 1 phút'],['Xoay khớp toàn thân','2 phút'],['Inchworm: bò tay ra rồi bước chân về','6 lần'],['Lunge bước tới kèm xoay thân','8 lần/bên'],['Nâng cao đùi tại chỗ','2 × 20 giây']]
+};
+const COOL=[['Kéo giãn bắp chân, đùi trước, đùi sau','30 giây/nhóm'],['Kéo giãn hông và lưng dưới','30 giây/bên'],['Kéo giãn vai, cẳng tay, cổ tay','30 giây/nhóm'],['Hít thở sâu: 4 nhịp vào, 6 nhịp ra','1 phút']];
+const PHASES=[
+ {n:1,name:'Nền tảng',desc:'Tư thế, cách cầm vợt, split-step, nhịp vung thuận tay và trái tay.'},
+ {n:2,name:'Di chuyển ngang & đánh cuối sân',desc:'Bước điều chỉnh, bắt chéo, hồi vị, lùi sau với bóng sâu.'},
+ {n:3,name:'Giao bóng, lên lưới, tiến – lùi',desc:'Tung bóng, tư thế cúp, chuỗi lực giao bóng, vô-lê và di chuyển 4 hướng.'},
+ {n:4,name:'Kết hợp, tốc độ & sức bền',desc:'Phản xạ, mô phỏng điểm số, phòng thủ và tổng kiểm tra.'}
+];
+const BK={fw:{label:'Bộ chân',c:'var(--foot-l)'},tech:{label:'Kỹ thuật',c:'var(--court)'},cond:{label:'Thể lực',c:'var(--good)'},warm:{label:'Khởi động',c:'var(--c-warm)'},cool:{label:'Thả lỏng',c:'var(--muted)'}};
+const SESS=[
+ {ph:1,title:'Tư thế sẵn sàng & cầm vợt',focus:['Split-step','Cách cầm vợt'],warm:'A',blocks:[
+  {k:'fw',m:12,items:[['Giữ tư thế chờ: chân rộng hơn vai, gối chùng, trọng tâm trên mũi chân','5 × 20 giây'],['Split-step tại chỗ theo nhịp vỗ tay hoặc đồng hồ','3 × 10 lần',{fw:'split'}],['Split-step rồi bước một bước sang phải, sang trái','3 × 8 lần']]},
+  {k:'tech',m:18,items:[['Đổi cách cầm Continental → Eastern → Semi-Western theo hiệu lệnh, không nhìn tay','3 × 10 lần'],['Vung không bóng từ tư thế chờ đến xoay vai thuận tay, dừng 2 giây','3 × 10 lần',{st:'forehand',ph:'turn'}],['Tâng bóng nhẹ trên mặt vợt (khó thì để bóng lăn trên mặt vợt)','3 × 30 giây']]},
+  {k:'cond',m:10,items:[['Squat','3 × 12'],['Plank','3 × 30 giây'],['Nhón gót','3 × 15']]}],
+  goal:'Split-step đúng nhịp, tiếp đất bằng mũi chân; đổi cách cầm vợt mà không cần nhìn.'},
+ {ph:1,title:'Split-step & trượt ngang',focus:['Trượt ngang','Vung thuận tay'],warm:'B',blocks:[
+  {k:'fw',m:15,items:[['Split-step rồi trượt ngang 2 bước sang phải, về giữa, sang trái','4 × 6 lượt',{fw:'shuffle'}],['Trượt ngang chạm hai mốc cách 3 m','4 × 20 giây'],['Thang dây: hai chân vào mỗi ô','4 lượt']]},
+  {k:'tech',m:15,items:[['Vung không bóng thuận tay đủ 6 giai đoạn, tốc độ chậm','3 × 10 lần',{st:'forehand',ph:'ready'}],['Tung và bắt bóng bằng tay trái, mắt nhìn bóng đến khi chạm tay','2 × 20 lần'],['Tâng bóng trên mặt vợt','3 × 30 lần']]},
+  {k:'cond',m:8,items:[['Ngồi dựa tường','3 × 30 giây'],['Lunge sang ngang','3 × 8/bên']]}],
+  goal:'Trượt ngang mà hai chân không chạm nhau, đầu không nhấp nhô.'},
+ {ph:1,title:'Thuận tay: xoay vai & điểm tiếp xúc',focus:['Thế mở','Điểm tiếp xúc'],warm:'A',blocks:[
+  {k:'fw',m:12,items:[['Trượt ngang 2 bước rồi dừng ở thế mở','4 × 6 lượt',{fw:'stance'}],['Bước điều chỉnh nhỏ quanh một quả bóng đặt trên sàn','3 × 30 giây',{fw:'adjust'}]]},
+  {k:'tech',m:20,items:[['Vung không bóng thuận tay, dừng 1 giây ở “thả đầu vợt” và “tiếp xúc”','3 × 10 lần',{st:'forehand',ph:'backswing'}],['Tự thả bóng, đánh nhẹ vào tường (hoặc bóng xốp vào nệm), chạm bóng trước chân trái','3 × 15 quả',{st:'forehand',ph:'contact'}],['Tâng bóng xen kẽ cao – thấp','2 × 30 lần']]},
+  {k:'cond',m:8,items:[['Lunge bước tới','3 × 10/bên'],['Gập bụng xoay thân (Russian twist)','3 × 20']]}],
+  goal:'Lúc chạm bóng, bóng nằm trước chân trái và ngang hông.'},
+ {ph:1,title:'Trái tay 2 tay & bước bắt chéo',focus:['Bắt chéo','Trái tay'],warm:'B',blocks:[
+  {k:'fw',m:14,items:[['Bước bắt chéo sang phải, rồi sang trái','4 × 5 lượt/bên',{fw:'crossover'}],['Trượt ngang sang trái, dừng ở thế trung lập (chân phải bước lên)','3 × 8 lượt',{fw:'stance'}]]},
+  {k:'tech',m:18,items:[['Vung không bóng trái tay 2 tay đủ các giai đoạn','3 × 10 lần',{st:'backhand',ph:'turn'}],['Vung trái tay chỉ bằng tay trái (cầm ngắn) để cảm nhận tay chủ đạo','2 × 10 lần',{st:'backhand',ph:'contact'}],['Tâng bóng bằng mặt trái của vợt','3 × 30 lần']]},
+  {k:'cond',m:8,items:[['Dead bug','3 × 10'],['Plank nghiêng','2 × 25 giây/bên']]}],
+  goal:'Khi kéo vợt trái tay, vai xoay đủ để cằm gần chạm vai phải.'},
+ {ph:1,title:'Kiểm tra giai đoạn 1',focus:['Quay video','AI chấm điểm'],warm:'A',test:true,blocks:[
+  {k:'fw',m:10,items:[['Vòng phối hợp: split-step → trượt ngang → bắt chéo → hồi vị','3 vòng',{fw:'recovery'}]]},
+  {k:'tech',m:20,items:[['Quay video thuận tay (vung không bóng hoặc đánh tường) từ bên hông, 5–8 giây','2 video',{ai:1}],['Tải lên phần AI chấm điểm, ghi lại tổng điểm và lỗi ưu tiên','1 lần',{ai:1}],['Tập lại lỗi ưu tiên theo gợi ý của AI','10 phút']]},
+  {k:'cond',m:8,items:[['Đo: số lần trượt ngang chạm hai mốc cách 3 m trong 30 giây','2 lần, lấy kết quả tốt nhất'],['Đo: nhảy dây 1 phút, đếm số lần','1 lần']]}],
+  goal:'Ghi lại điểm AI và kết quả đo để so sánh ở buổi 10, 15 và 20.'},
+
+ {ph:2,title:'Bước điều chỉnh nhỏ',focus:['Bước điều chỉnh','Thang dây'],warm:'B',blocks:[
+  {k:'fw',m:15,items:[['Bước điều chỉnh quanh bóng đặt sàn, dừng cách bóng một sải tay cộng vợt','4 × 30 giây',{fw:'adjust'}],['Thang dây: một chân mỗi ô, chạy nhanh','4 lượt'],['Thang dây: vào – vào – ra – ra','4 lượt']]},
+  {k:'tech',m:18,items:[['Tự thả bóng, đánh thuận tay với một quả bóng mốc đặt trước chân trái','3 × 15 quả',{st:'forehand',ph:'contact'}],['Vung không bóng ở thế mở và thế bán mở xen kẽ','2 × 10 mỗi thế',{fw:'stance'}]]},
+  {k:'cond',m:8,items:[['Bật nhảy squat','3 × 8'],['Plank chạm vai','3 × 16']]}],
+  goal:'Dừng đúng vị trí trước khi vung, không phải với tay hay ngả người khi đánh.'},
+ {ph:2,title:'Thuận tay khi di chuyển rộng',focus:['Bắt chéo','Hồi vị'],warm:'A',blocks:[
+  {k:'fw',m:15,items:[['Bắt chéo sang phải → thế mở vung thuận tay → hồi vị','4 × 5 lượt',{fw:'crossover'}],['Hồi vị: bắt chéo về, trượt ngang, kết thúc bằng split-step','4 × 5 lượt',{fw:'recovery'}]]},
+  {k:'tech',m:15,items:[['Vung không bóng thuận tay ngay sau di chuyển, giữ thăng bằng 2 giây ở cuối','3 × 8 lần',{st:'forehand',ph:'follow'}],['Tâng bóng xen kẽ hai mặt vợt','3 × 40 lần']]},
+  {k:'cond',m:10,items:[['Lunge sang ngang','3 × 10/bên'],['Bật nhảy trượt băng (skater jump)','3 × 10']]}],
+  goal:'Sau cú đánh rộng, về đến giữa và split-step trong 3–4 bước.'},
+ {ph:2,title:'Trái tay & bước đan chéo',focus:['Carioca','Trái tay'],warm:'B',blocks:[
+  {k:'fw',m:15,items:[['Bước đan chéo 4 m sang phải rồi sang trái','4 lượt',{fw:'carioca'}],['Bắt chéo sang trái → thế trung lập vung trái tay → hồi vị','4 × 5 lượt',{fw:'crossover'}]]},
+  {k:'tech',m:18,items:[['Tự thả bóng, đánh trái tay 2 tay vào tường','3 × 15 quả',{st:'backhand',ph:'contact'}],['Vung không bóng trái tay từ thấp lên cao, kết thúc qua vai phải','3 × 10 lần',{st:'backhand',ph:'follow'}]]},
+  {k:'cond',m:10,items:[['Kéo dây kháng lực về ngực (row)','3 × 12'],['Xoay vai ra ngoài với dây kháng lực','3 × 12/tay']]}],
+  goal:'Giữ cả hai tay trên cán đến hết cú theo vợt, không mở vai sớm.'},
+ {ph:2,title:'Lùi sau với bóng sâu',focus:['Drop step','Trái tay cắt'],warm:'A',blocks:[
+  {k:'fw',m:15,items:[['Bước xoay lùi sang phải và sang trái','4 × 5 lượt/bên',{fw:'dropstep'}],['Xoay lùi → bắt chéo lùi 2 bước → dừng, vung thuận tay','3 × 6 lượt']]},
+  {k:'tech',m:15,items:[['Vung không bóng trái tay cắt, từ cao xuống thấp','3 × 10 lần',{st:'slice',ph:'backswing'}],['Vung thuận tay khi đang lùi, dồn trọng tâm lên chân trước lúc chạm','3 × 8 lần',{st:'forehand',ph:'contact'}]]},
+  {k:'cond',m:10,items:[['Burpee','3 × 8'],['Giữ thân hình thuyền (hollow hold)','3 × 20 giây']]}],
+  goal:'Bước đầu tiên khi lùi là xoay hông, không chạy lùi bằng gót.'},
+ {ph:2,title:'Kiểm tra giai đoạn 2',focus:['Bài con nhện','AI chấm điểm'],warm:'B',test:true,blocks:[
+  {k:'fw',m:12,items:[['Bài “con nhện”: từ tâm chạm 5 mốc (trái, chéo trái, trước, chéo phải, phải) cách 2 m, bấm giờ','2 lần',{fw:'shuffle'}]]},
+  {k:'tech',m:20,items:[['Quay video thuận tay và trái tay, chấm bằng AI','2 video',{ai:1}],['So sánh điểm với buổi 5, ghi lỗi ưu tiên mới','5 phút',{ai:1}],['Tập riêng lỗi ưu tiên','10 phút']]},
+  {k:'cond',m:6,items:[['Nhảy dây 1 phút, đếm số lần','1 lần']]}],
+  goal:'Điểm AI thuận tay tăng so với buổi 5; thời gian bài con nhện giảm.'},
+
+ {ph:3,title:'Giao bóng: tung bóng & tư thế cúp',focus:['Tung bóng','Tư thế cúp'],warm:'A',note:'Trần nhà thấp: tập bằng khăn hoặc cầm vợt sát đầu vợt.',blocks:[
+  {k:'fw',m:10,items:[['Tiếp đất bằng chân trái sau động tác giao bóng, giữ thăng bằng 2 giây','3 × 8 lần'],['Tiếp đất rồi split-step ngay','3 × 8 lần',{fw:'split'}]]},
+  {k:'tech',m:22,items:[['Đặt vợt dưới đất trước chân trái, tung bóng sao cho bóng rơi trúng mặt vợt','3 × 20 lần',{st:'serve',ph:'toss'}],['Dừng ở tư thế cúp 2 giây rồi hạ xuống','3 × 10 lần',{st:'serve',ph:'trophy'}],['Động tác ném bóng qua vai, không cầm vợt','2 × 10 lần']]},
+  {k:'cond',m:8,items:[['Xoay vai ra ngoài với dây kháng lực','3 × 12/tay'],['Nhón gót một chân','3 × 12/bên']]}],
+  goal:'7/10 lần tung bóng rơi trúng vợt mốc; ở tư thế cúp vai trái cao hơn vai phải.'},
+ {ph:3,title:'Giao bóng: chuỗi lực toàn động tác',focus:['Thả vợt sau lưng','Pronation'],warm:'B',note:'Trần nhà thấp: tập bằng khăn hoặc cầm vợt sát đầu vợt.',blocks:[
+  {k:'fw',m:8,items:[['Bật lên từ tư thế chùng gối, tiếp đất bằng chân trái','3 × 8 lần']]},
+  {k:'tech',m:22,items:[['Vung không bóng giao bóng đủ động tác, nửa tốc độ','3 × 10 lần',{st:'serve',ph:'drop'}],['Cầm ngược vợt (phía đầu vợt), vung nhanh để nghe tiếng “vút” ở phía trước','3 × 10 lần',{st:'serve',ph:'contact'}],['Kết thúc với cẳng tay xoay trong, vợt về bên trái người','2 × 10 lần',{st:'serve',ph:'follow'}]]},
+  {k:'cond',m:10,items:[['Plank nghiêng xoay thân','3 × 10/bên'],['Bật nhảy cao','3 × 8']]}],
+  goal:'Tiếng “vút” to nhất ở phía trước đầu, không phải sau lưng.'},
+ {ph:3,title:'Vô-lê & tiến lên lưới',focus:['Tiến lên lưới','Vô-lê'],warm:'A',blocks:[
+  {k:'fw',m:14,items:[['Tiến 3 bước → split-step → bước chéo chân trái lên chặn bóng','4 × 6 lượt',{fw:'approach'}],['Thang dây tiến thẳng: hai chân mỗi ô','4 lượt']]},
+  {k:'tech',m:18,items:[['Bắt bóng bằng tay không ở tư thế vô-lê, trước mặt','2 × 20 lần',{st:'volley',ph:'contact'}],['Vô-lê vào tường cự ly 2–3 m, chặn ngắn, không vung','3 × 20 lần',{st:'volley',ph:'follow'}]]},
+  {k:'cond',m:8,items:[['Lunge bước tiến','3 × 10/bên'],['Leo núi (mountain climber)','3 × 20 giây']]}],
+  goal:'Vô-lê 10 quả liên tục vào tường mà vợt không ra sau vai.'},
+ {ph:3,title:'Di chuyển 4 hướng',focus:['Thang dây','Chuỗi di chuyển'],warm:'B',blocks:[
+  {k:'fw',m:18,items:[['Thang dây: ickey shuffle','4 lượt'],['Bài chữ X: tiến chéo, lùi chéo bằng bước xoay lùi','4 × 4 lượt',{fw:'dropstep'}],['Đan chéo kết hợp bắt chéo hồi vị','3 × 4 lượt',{fw:'carioca'}]]},
+  {k:'tech',m:15,items:[['Chuỗi vung không bóng: thuận tay rộng → hồi vị → trái tay → hồi vị → lên lưới vô-lê','4 vòng',{fw:'recovery'}]]},
+  {k:'cond',m:6,items:[['Tabata: 20 giây nhảy dây hoặc bật nhảy, 10 giây nghỉ','8 hiệp (4 phút)']]}],
+  goal:'Split-step trước mọi cú trong chuỗi, không lúc nào đứng chôn chân.'},
+ {ph:3,title:'Kiểm tra giai đoạn 3',focus:['Giao bóng','Vô-lê','AI chấm điểm'],warm:'A',test:true,blocks:[
+  {k:'fw',m:10,items:[['Bài con nhện như buổi 10, bấm giờ','2 lần',{fw:'shuffle'}]]},
+  {k:'tech',m:22,items:[['Quay video giao bóng và vô-lê, chấm bằng AI','2 video',{ai:1}],['Quay lại thuận tay, so sánh với buổi 5 và 10','1 video',{ai:1}],['Tập lỗi ưu tiên của giao bóng','10 phút',{st:'serve',ph:'trophy'}]]},
+  {k:'cond',m:6,items:[['Nhảy dây 1 phút, đếm số lần','1 lần']]}],
+  goal:'Giao bóng đạt từ 55 điểm AI trở lên (mức “Khá”).'},
+
+ {ph:4,title:'Tốc độ phản xạ',focus:['Phản xạ','Bước đầu tiên'],warm:'B',blocks:[
+  {k:'fw',m:18,items:[['Phản xạ theo hiệu lệnh: người khác chỉ hướng (hoặc ứng dụng hô ngẫu nhiên), split-step rồi di chuyển 2 bước','6 × 20 giây',{fw:'split'}],['Split-step theo tiếng bóng nảy: thả bóng xuống sàn, bật đúng lúc bóng chạm sàn','3 × 10 lần']]},
+  {k:'tech',m:15,items:[['Đánh tường cự ly gần, xen kẽ thuận tay và trái tay','3 × 1 phút',{st:'forehand',ph:'contact'}]]},
+  {k:'cond',m:8,items:[['Chạy nước rút tại chỗ','6 × 10 giây'],['Plank','2 × 45 giây']]}],
+  goal:'Bước đầu tiên bắt đầu trong vòng nửa giây sau hiệu lệnh.'},
+ {ph:4,title:'Mô phỏng điểm số',focus:['Chuỗi cú đánh','Nhịp thi đấu'],warm:'A',blocks:[
+  {k:'fw',m:8,items:[['Trượt ngang và bắt chéo tốc độ cao','2 × 30 giây',{fw:'shuffle'}]]},
+  {k:'tech',m:25,items:[['Mô phỏng một điểm: giao bóng → hồi vị → thuận tay chéo → trái tay → lên lưới vô-lê','6 điểm × 3 hiệp',{fw:'recovery'}],['Nghỉ 25 giây giữa các điểm, 90 giây giữa các hiệp như khi đổi sân','—']]},
+  {k:'cond',m:8,items:[['Vòng bụng: dead bug, plank nghiêng, hollow hold','2 vòng']]}],
+  goal:'Giữ kỹ thuật chuẩn đến điểm cuối cùng của hiệp 3.'},
+ {ph:4,title:'Trái tay cắt & phòng thủ',focus:['Bóng rộng','Trái tay cắt'],warm:'B',blocks:[
+  {k:'fw',m:15,items:[['Bước xoay lùi kết hợp đan chéo lùi','4 × 4 lượt',{fw:'dropstep'}],['Bóng rất rộng: bước chéo dài, hạ trọng tâm, giữ thăng bằng trên chân ngoài','3 × 6 lượt/bên',{fw:'crossover'}]]},
+  {k:'tech',m:18,items:[['Trái tay cắt vào tường, bóng thấp dưới vạch mốc 1 m','3 × 15 quả',{st:'slice',ph:'contact'}],['Đổi trái tay 2 tay ↔ trái tay cắt theo hiệu lệnh','3 × 10 lần',{st:'slice',ph:'follow'}]]},
+  {k:'cond',m:8,items:[['Lunge sang ngang','3 × 10/bên'],['Kéo dây kháng lực','3 × 12']]}],
+  goal:'Bóng cắt đi thấp; tay trái giữ phía sau đến hết cú đánh.'},
+ {ph:4,title:'Sức bền thi đấu',focus:['Interval','Kỹ thuật khi mệt'],warm:'A',blocks:[
+  {k:'fw',m:12,items:[['Interval: 40 giây di chuyển kèm vung không bóng đủ các cú, 20 giây nghỉ','8 hiệp',{fw:'recovery'}]]},
+  {k:'tech',m:13,items:[['Quay video hiệp cuối, cho AI chấm để xem kỹ thuật khi mệt','1 video',{ai:1}],['Tập chậm lại lỗi xuất hiện khi mệt','8 phút']]},
+  {k:'cond',m:10,items:[['Plank thường, plank nghiêng, plank chạm vai','3 vòng × 30 giây'],['Squat giữ 3 giây ở điểm thấp nhất','2 × 10']]}],
+  goal:'Đến hiệp 8 vẫn split-step và xoay vai đầy đủ.'},
+ {ph:4,title:'Tổng kiểm tra & kế hoạch tiếp theo',focus:['4 cú đánh','So sánh tiến bộ'],warm:'B',test:true,blocks:[
+  {k:'fw',m:10,items:[['Bài con nhện và trượt ngang 30 giây, so với buổi 5','2 lần mỗi bài',{fw:'shuffle'}]]},
+  {k:'tech',m:25,items:[['Quay 4 cú: thuận tay, trái tay, giao bóng, vô-lê; chấm bằng AI','4 video',{ai:1}],['So sánh điểm các buổi 5 – 10 – 15 – 20 trong mục “Tiến bộ của bạn”','5 phút',{ai:1}],['Chọn 2 điểm yếu nhất làm trọng tâm cho 4 tuần tiếp theo','5 phút']]},
+  {k:'cond',m:5,items:[['Nhảy dây 1 phút, đếm số lần','1 lần']]}],
+  goal:'Có kế hoạch cho giai đoạn tiếp theo và sẵn sàng ra sân tập với bạn hoặc huấn luyện viên.'}
+];
+SESS.forEach((s,i)=>{s.n=i+1;s.total=10+5+s.blocks.reduce((a,b)=>a+b.m,0);});
+
+const PK='santap-plan-v1';
+let plan={cur:1,done:[]};
+try{const v=JSON.parse(localStorage.getItem(PK)||'null');if(v&&Array.isArray(v.done))plan={cur:Math.min(20,Math.max(1,+v.cur||1)),done:v.done.filter(n=>n>=1&&n<=20)};}catch{}
+const savePlan=()=>{try{localStorage.setItem(PK,JSON.stringify(plan));}catch{}};
+
+function renderSessList(){
+  const box=$('#sessList'); box.textContent='';
+  PHASES.forEach(p=>{
+    const g=el('div','ph-group'); const h=el('h4'); h.append(el('em',null,'GĐ '+p.n+' · '),document.createTextNode(p.name)); g.append(h);
+    const btns=el('div','ph-btns');
+    SESS.filter(s=>s.ph===p.n).forEach(s=>{
+      const b=el('button','sess-btn'+(s.n===plan.cur?' on':'')+(plan.done.includes(s.n)?' done':'')+(s.test?' test':''));
+      b.type='button'; b.setAttribute('aria-label',`Buổi ${s.n}: ${s.title}${plan.done.includes(s.n)?' (đã tập)':''}`);
+      if(s.n===plan.cur) b.setAttribute('aria-current','true');
+      b.title=`Buổi ${s.n}: ${s.title}`; b.append(el('span','n',String(s.n)),el('span','t',s.title),el('span','ck','✓'));
+      b.onclick=()=>{plan.cur=s.n;savePlan();renderPlan();if(matchMedia('(max-width:960px)').matches)$('#sess').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});};
+      btns.append(b);
+    });
+    g.append(btns); box.append(g);
+  });
+  const n=plan.done.length; $('#progTxt').textContent=n+'/20'; $('#progBar').style.width=(n/20*100)+'%';
+}
+function itemLink(l){
+  if(!l) return null;
+  const b=el('button','lk'); b.type='button';
+  if(l.fw){b.textContent='Xem sơ đồ bộ chân: '+(l.fw==='stance'?'Thế chân khi đánh':FW[l.fw].name);b.onclick=()=>goFootwork(l.fw);}
+  else if(l.st){const s=STROKES[l.st];const ph=s.phases.find(p=>p.id===l.ph);b.textContent=`Xem mẫu 3D: ${s.name} · ${ph?ph.name:''}`;b.onclick=()=>{selectStroke(l.st,{phase:l.ph});$('#mo-phong').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});};}
+  else if(l.ai){b.textContent='Mở AI chấm điểm';b.onclick=()=>{const k=SESS[plan.cur-1];$('#cham-diem').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});};}
+  return b;
+}
+let stage=null;
+const PLAY_SVG='<path d="M7 4.5v15L19.5 12z"/>', PAUSE_SVG='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+let dvClip=null;
+try{ if(!window.THREE) throw 0; stage=createDrillStage($('#dvCanvas'),$('#dvView'),{
+  onPhase:i=>document.querySelectorAll('#dvSteps button').forEach((b,j)=>b.classList.toggle('on',j===i)),
+  onTime:f=>{$('#dvScrub').value=Math.round(f*1000);},
+  onPlay:v=>{$('#dvPlayIcon').innerHTML=v?PAUSE_SVG:PLAY_SVG;$('#dvPlay').setAttribute('aria-label',v?'Tạm dừng':'Phát');},
+  onCam:n=>document.querySelectorAll('#dvCam button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cam===n?'true':'false'))
+});}catch(e){stage=null;$('#dvFail').hidden=false;}
+$('#dvPlay').onclick=()=>stage&&stage.toggle();
+$('#dvPrev').onclick=()=>stage&&stage.jump(stage.phase()-1);
+$('#dvNext').onclick=()=>stage&&stage.jump(stage.phase()+1);
+$('#dvScrub').addEventListener('input',e=>stage&&stage.seek(e.target.value/1000));
+document.querySelectorAll('#dvSpeed button').forEach(b=>b.onclick=()=>{stage&&stage.setSpeed(+b.dataset.speed);document.querySelectorAll('#dvSpeed button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));if(stage&&!stage.isPlaying())stage.toggle();});
+document.querySelectorAll('#dvCam button').forEach(b=>b.onclick=()=>stage&&stage.setCam(b.dataset.cam));
+function selectDrill(id,li,scroll){
+  const [base,phase]=id.split('@'); const clip=getClip(base); if(!clip) return;
+  dvClip=clip;
+  document.querySelectorAll('#sessContent .it').forEach(x=>{x.classList.toggle('sel',x===li);x.setAttribute('aria-pressed',x===li?'true':'false');});
+  $('#dvName').textContent=clip.name;
+  const ol=$('#dvSteps'); ol.textContent='';
+  clip.phases.forEach((p,i)=>{const b=el('button');b.type='button';const tx=el('span');tx.append(el('b',null,p.name),el('small',null,p.cue));b.append(el('span','ph-n',String(i+1)),tx);b.onclick=()=>stage&&stage.jump(i);const l=el('li');l.append(b);ol.append(l);});
+  if(!stage&&clip.phases[0]) ol.querySelector('button').classList.add('on');
+  $('#dvTips').textContent=clip.tips||'';
+  $('#dvLegend').hidden=!clip.grip; $('#dvCam').hidden=!!clip.grip;
+  if(stage) stage.setClip(clip,{phase:phase||null});
+  if(scroll){const r=$('#dv').getBoundingClientRect();if(r.top<0||r.top>innerHeight*.6)$('#dv').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});}
+}
+function renderSess(){
+  const s=SESS[plan.cur-1], p=PHASES[s.ph-1], head=$('#sessHead'), box=$('#sessContent'); head.textContent=''; box.textContent='';
+  head.append(el('p','eyebrow',`Buổi ${s.n}/20 · Giai đoạn ${p.n}: ${p.name}`), el('h3',null,s.title));
+  const meta=el('div','sess-meta'); meta.append(el('span','dur',s.total+' phút')); s.focus.forEach(f=>meta.append(el('span','chip',f))); if(s.test) meta.append(el('span','chip sev','Buổi kiểm tra')); head.append(meta);
+  const segs=[{k:'warm',m:10},...s.blocks,{k:'cool',m:5}];
+  const tl=el('div','tl'); segs.forEach(g=>{const i=el('i');i.style.flex=g.m;i.style.background=BK[g.k].c;i.title=BK[g.k].label+' '+g.m+' phút';tl.append(i);}); head.append(tl);
+  const leg=el('div','tl-leg'); segs.forEach(g=>{const sp=el('span');const i=el('i');i.style.background=BK[g.k].c;sp.append(i,document.createTextNode(`${BK[g.k].label} ${g.m}′`));leg.append(sp);}); head.append(leg);
+  if(s.note) head.append(el('p','sess-note',s.note));
+  let first=null, firstFw=null;
+  const blk=(k,m,items)=>{
+    const d=el('div','blk'); d.style.setProperty('--bc',BK[k].c);
+    const h=el('div','blk-h'); h.append(el('b',null,m+'′'),el('small',null,BK[k].label)); d.append(h);
+    const ul=el('ul','items');
+    items.forEach(item=>{const [t,dose,l]=item; const li=el('li','it'); const a=animFor(item);
+      const name=el('span'); if(a){name.append(el('span','t3d','▶ 3D'));} name.append(document.createTextNode(t));
+      li.append(name,el('span','dose',dose));
+      const lk=itemLink(l); if(lk){lk.addEventListener('click',e=>e.stopPropagation());li.append(lk);}
+      if(a){li.classList.add('has3d');li.tabIndex=0;li.setAttribute('role','button');li.setAttribute('aria-pressed','false');
+        li.onclick=()=>selectDrill(a,li,true); li.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectDrill(a,li,true);}};
+        if(!first) first=[a,li]; if(k==='fw'&&!firstFw) firstFw=[a,li];}
+      ul.append(li);});
+    d.append(ul); box.append(d);
+  };
+  blk('warm',10,WARM[s.warm]);
+  s.blocks.forEach(b=>blk(b.k,b.m,b.items));
+  blk('cool',5,COOL);
+  const goal=el('div','goal'); goal.append(el('b',null,'Đạt yêu cầu khi: '),document.createTextNode(s.goal)); box.append(goal);
+  const nav=el('div','sess-nav');
+  const prev=el('button','ghost',s.n>1?'← Buổi '+(s.n-1):'← Buổi trước'); prev.type='button'; prev.disabled=s.n===1; prev.onclick=()=>{plan.cur--;savePlan();renderPlan();};
+  const isDone=plan.done.includes(s.n);
+  const done=el('button','done-btn'+(isDone?' is-done':''),isDone?'✓ Đã tập buổi này':'Đánh dấu đã tập'); done.type='button';
+  done.setAttribute('aria-pressed',isDone?'true':'false');
+  done.onclick=()=>{if(plan.done.includes(s.n))plan.done=plan.done.filter(n=>n!==s.n);else{plan.done.push(s.n);}savePlan();renderSessList();renderSessNavOnly(done,s.n);};
+  const next=el('button','ghost','Buổi '+(s.n+1)+' →'); next.type='button'; next.disabled=s.n===20; next.onclick=()=>{plan.cur++;savePlan();renderPlan();};
+  if(s.n===20) next.textContent='Hoàn thành';
+  nav.append(prev,done,next); box.append(nav);
+  const pick=firstFw||first; if(pick) selectDrill(pick[0],pick[1],false);
+}
+function renderSessNavOnly(btn,n){const d=plan.done.includes(n);btn.className='done-btn'+(d?' is-done':'');btn.textContent=d?'✓ Đã tập buổi này':'Đánh dấu đã tập';btn.setAttribute('aria-pressed',d?'true':'false');}
+function renderPlan(){renderSessList();renderSess();}
+renderPlan();
+window.__santap.SESS=SESS; window.__santap.FW=FW;
+})();
+</script>
+
+</body>
+</html>
